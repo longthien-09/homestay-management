@@ -226,7 +226,6 @@ INSERT INTO bookings (user_id, room_id, check_in, check_out, status) VALUES
 INSERT INTO payments (booking_id, amount, payment_date, method, status) VALUES
 (1, 1000000, '2024-08-01 10:00:00', 'CASH', 'PAID'),
 (2, 1600000, '2024-08-05 12:00:00', 'CREDIT_CARD', 'UNPAID');
-
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -238,3 +237,4 @@ INSERT INTO payments (booking_id, amount, payment_date, method, status) VALUES
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-08-21 17:44:31
+
