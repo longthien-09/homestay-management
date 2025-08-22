@@ -1,0 +1,36 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="com.homestay.model.User" %>
+<%
+    String ctx = request.getContextPath();
+    User currentUser = (User) session.getAttribute("currentUser");
+%>
+<style>
+    .site-header { display:flex; align-items:center; justify-content:space-between; padding:14px 22px; background:#0d6efd; color:#fff; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+    .brand { font-weight:700; font-size:20px; letter-spacing:.2px; }
+    .nav { display:flex; gap:12px; align-items:center; }
+    .nav a { color:#fff; text-decoration:none; padding:8px 10px; border-radius:6px; transition:.15s ease; font-weight:500; }
+    .nav a:hover { background:rgba(255,255,255,.16); }
+    .cta { background:#ffc107; color:#212529 !important; }
+    .user-pill { background:rgba(255,255,255,.16); padding:6px 10px; border-radius:999px; }
+</style>
+<header class="site-header">
+    <div class="brand"><a href="<%=ctx%>/home" style="color:#fff; text-decoration:none;">Homestay Management</a></div>
+    <nav class="nav">
+        <a href="<%=ctx%>/home">Trang chủ</a>
+        <a href="<%=ctx%>/homestays">Homestays</a>
+        <a href="<%=ctx%>/services">Services</a>
+        <a class="cta" href="<%=ctx%>/homestay-manager/register">Đăng ký quản lý homestay</a>
+        <% if (currentUser == null) { %>
+            <a href="<%=ctx%>/login">Đăng nhập</a>
+            <a href="<%=ctx%>/register">Đăng ký</a>
+        <% } else { %>
+            <span class="user-pill"><%= currentUser.getFullName() != null ? currentUser.getFullName() : currentUser.getUsername() %> • <%= currentUser.getRole() %></span>
+            <a href="<%=ctx%>/user/profile">Thông tin cá nhân</a>
+            <% if ("ADMIN".equals(currentUser.getRole())) { %>
+                <a href="<%=ctx%>/user/list">Quản lý người dùng</a>
+            <% } %>
+            <a href="<%=ctx%>/logout">Đăng xuất</a>
+        <% } %>
+    </nav>
+</header>
+<hr style="border:none; border-top:1px solid #eee; margin:0;"/>
