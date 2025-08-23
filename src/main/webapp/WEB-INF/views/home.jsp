@@ -109,78 +109,185 @@
             transform: scale(1.2);
         }
         
+
+        
         /* Search bar styles */
         .search-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1a1a1a;
             padding: 40px 20px;
             margin-bottom: 40px;
             text-align: center;
         }
         
         .search-container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
         }
         
-        .search-title {
-            color: white;
-            margin-bottom: 30px;
-        }
-        
-        .search-title h2 {
-            margin: 0 0 10px 0;
-            font-size: 2.5em;
-            font-weight: 300;
-        }
-        
-        .search-title p {
-            margin: 0;
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-        
         .search-form {
-            background: white;
-            border-radius: 50px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            justify-content: center;
+            background: #2a2a2a;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
         
-        .search-input {
-            flex: 1;
-            padding: 15px 20px;
-            border: 2px solid #e9ecef;
-            border-radius: 25px;
+        .location-search {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .location-input {
+            width: 100%;
+            padding: 18px 20px 18px 50px;
+            background: #333;
+            border: 1px solid #444;
+            border-radius: 10px;
+            color: white;
             font-size: 16px;
             outline: none;
-            transition: border-color 0.3s ease;
         }
         
-        .search-input:focus {
+        .location-input::placeholder {
+            color: #aaa;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 18px;
+        }
+        
+        .search-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .search-field {
+            position: relative;
+            background: #333;
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .search-field:hover {
             border-color: #667eea;
         }
         
+        .field-icon {
+            color: #aaa;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        
+        .field-content {
+            color: white;
+            font-size: 14px;
+        }
+        
+        .field-label {
+            color: #aaa;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .add-flight {
+            text-align: left;
+            margin-bottom: 25px;
+        }
+        
+        .add-flight a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s ease;
+        }
+        
+        .add-flight a:hover {
+            color: #5a6fd8;
+        }
+        
         .search-btn {
+            width: 100%;
             background: #667eea;
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 25px;
-            font-size: 16px;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 18px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            min-width: 120px;
         }
         
         .search-btn:hover {
             background: #5a6fd8;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* Dropdown styles */
+        .room-type-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #333;
+            border: 1px solid #444;
+            border-radius: 10px;
+            margin-top: 5px;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .dropdown-item {
+            padding: 15px 20px;
+            color: white;
+            cursor: pointer;
+            border-bottom: 1px solid #444;
+            transition: background 0.3s ease;
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-item:hover {
+            background: #444;
+        }
+        
+        .search-field {
+            position: relative;
+        }
+        
+        .date-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 10;
+            font-size: 16px; /* Prevent zoom on mobile */
+        }
+        
+        .search-field {
+            cursor: pointer;
+        }
+        
+        .search-field:hover {
+            border-color: #667eea;
+            background: #3a3a3a;
         }
         
         /* Homestay list styles */
@@ -375,14 +482,54 @@
         </div>
     </div>
 
-<div class="search-section">
-    <div class="search-container">
-        <form action="search.jsp" method="GET" class="search-form">
-            <input type="text" name="address" class="search-input" placeholder="Nhập thông tin homestay..." required>
-            <button type="submit" class="search-btn">Tìm kiếm</button>
-        </form>
+    <!-- Search Section -->
+    <div class="search-section">
+        <div class="search-container">
+            <form class="search-form">
+                <div class="location-search">
+                <span class="search-icon">🔍</span>
+                    <input type="text" class="location-input" placeholder="Hồ Chí Minh" value="Hồ Chí Minh">
+                </div>
+                
+                <div class="search-details">
+                    <div class="search-field">
+                        <span class="field-icon">📅</span>
+                        <div>
+                            <div class="field-content" id="checkin-date">7 tháng 12 2025</div>
+                            <div class="field-label" id="checkin-day">Chủ nhật</div>
+                        </div>
+                        <input type="date" id="checkin-input" class="date-input" onchange="updateCheckinDate(this.value)">
+                    </div>
+                    
+                    <div class="search-field">
+                        <span class="field-icon">📅</span>
+                        <div>
+                            <div class="field-content" id="checkout-date">8 tháng 12 2025</div>
+                            <div class="field-label" id="checkout-day">Thứ Hai</div>
+                        </div>
+                        <input type="date" id="checkout-input" class="date-input" onchange="updateCheckoutDate(this.value)">
+                    </div>
+                    
+                    <div class="search-field" onclick="toggleRoomTypeDropdown()">
+                        <span class="field-icon">🏠</span>
+                        <div>
+                            <div class="field-content" id="room-type-text">Loại phòng</div>
+                            <span style="color: #aaa; margin-left: 10px;">▼</span>
+                        </div>
+                        <div id="room-type-dropdown" class="room-type-dropdown" style="display: none;">
+                            <div class="dropdown-item" onclick="selectRoomType('Tất cả')">Tất cả</div>
+                            <div class="dropdown-item" onclick="selectRoomType('Phòng đơn')">Phòng đơn</div>
+                            <div class="dropdown-item" onclick="selectRoomType('Phòng đôi')">Phòng đôi</div>
+                            <div class="dropdown-item" onclick="selectRoomType('Phòng gia đình')">Phòng gia đình</div>
+                            <div class="dropdown-item" onclick="selectRoomType('Phòng VIP')">Phòng VIP</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="search-btn">TÌM</button>
+            </form>
+        </div>
     </div>
-</div>
 
 <div class="homestay-section">
     <div class="homestay-container">
@@ -415,21 +562,21 @@
                 <div class="homestay-card">
                     <div class="homestay-image">
                         <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Homestay mẫu">
-                    </div>
+            </div>
                     <div class="homestay-info">
                         <h3 class="homestay-name">Chưa có homestay</h3>
                         <p class="homestay-address">Hãy thêm homestay đầu tiên!</p>
-                    </div>
-                </div>
+            </div>
+            </div>
             <% } %>
         </div>
         <div class="view-all-container">
             <a href="homestay-list.jsp" class="view-all-btn">Xem tất cả Homestay</a>
         </div>
+        </div>
     </div>
-</div>
-
-<script>
+    
+    <script>
 let currentSlideIndex = 0;
 const slides = document.querySelectorAll('.slide');
 const dots = document.querySelectorAll('.dot');
@@ -460,7 +607,106 @@ function currentSlide(index) {
 setInterval(() => {
     changeSlide(1);
 }, 5000);
-</script>
+
+// Date picker functions
+function openDatePicker(type) {
+    if (type === 'checkin') {
+        document.getElementById('checkin-input').click();
+    } else if (type === 'checkout') {
+        document.getElementById('checkout-input').click();
+    }
+}
+
+// Add click event listeners to date fields
+document.addEventListener('DOMContentLoaded', function() {
+    const checkinField = document.querySelector('.search-field:first-child');
+    const checkoutField = document.querySelector('.search-field:nth-child(2)');
+    
+    if (checkinField) {
+        checkinField.addEventListener('click', function(e) {
+            e.preventDefault();
+            const input = document.getElementById('checkin-input');
+            if (input) {
+                input.click();
+            }
+        });
+    }
+    
+    if (checkoutField) {
+        checkoutField.addEventListener('click', function(e) {
+            e.preventDefault();
+            const input = document.getElementById('checkout-input');
+            if (input) {
+                input.click();
+            }
+        });
+    }
+    
+    console.log('Date picker event listeners added');
+    
+    // Test function
+    window.testDatePicker = function() {
+        console.log('Testing date picker...');
+        const checkinInput = document.getElementById('checkin-input');
+        const checkoutInput = document.getElementById('checkout-input');
+        console.log('Checkin input:', checkinInput);
+        console.log('Checkout input:', checkoutInput);
+        
+        if (checkinInput) {
+            checkinInput.click();
+        }
+    };
+});
+        
+function updateCheckinDate(dateString) {
+    const date = new Date(dateString);
+    const dayNames = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+    const monthNames = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+    
+    const day = date.getDate();
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    const dayName = dayNames[date.getDay()];
+    
+    document.getElementById('checkin-date').textContent = `${day} tháng ${month} ${year}`;
+    document.getElementById('checkin-day').textContent = dayName;
+}
+
+function updateCheckoutDate(dateString) {
+    const date = new Date(dateString);
+    const dayNames = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+    const monthNames = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+    
+    const day = date.getDate();
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    const dayName = dayNames[date.getDay()];
+    
+    document.getElementById('checkout-date').textContent = `${day} tháng ${month} ${year}`;
+    document.getElementById('checkout-day').textContent = dayName;
+}
+
+// Room type dropdown functions
+function toggleRoomTypeDropdown() {
+    const dropdown = document.getElementById('room-type-dropdown');
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+}
+
+function selectRoomType(type) {
+    document.getElementById('room-type-text').textContent = type;
+    document.getElementById('room-type-dropdown').style.display = 'none';
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('room-type-dropdown');
+    const roomTypeField = document.querySelector('.search-field:last-child');
+    
+    if (!roomTypeField.contains(event.target)) {
+        dropdown.style.display = 'none';
+    }
+        });
+    </script>
 
 <%@ include file="partials/footer.jspf" %>
 </body>

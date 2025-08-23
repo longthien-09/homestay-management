@@ -166,6 +166,7 @@
             
             <div class="actions">
                 <a href="/homestay-management/homestays" class="btn btn-secondary">← Quay lại danh sách</a>
+                <a href="/homestay-management/homestays/<%= homestay.getId() %>/rooms" class="btn btn-primary">🏠 Xem danh sách phòng</a>
                 <% if (session.getAttribute("currentUser") != null && "ADMIN".equals(((com.homestay.model.User)session.getAttribute("currentUser")).getRole())) { %>
                 <a href="/homestay-management/admin/homestays/edit/<%= homestay.getId() %>" class="btn btn-primary">✏️ Chỉnh sửa</a>
                 <% } %>
