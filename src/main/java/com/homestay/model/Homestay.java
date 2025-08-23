@@ -7,6 +7,7 @@ public class Homestay {
     private String phone;
     private String email;
     private String description;
+    private String image;
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -20,4 +21,6 @@ public class Homestay {
     public void setEmail(String email) { this.email = email; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
 }
