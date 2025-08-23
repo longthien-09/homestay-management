@@ -9,6 +9,7 @@ public class Room {
     private String status;
     private String description;
     private int homestayId;
+    private String image;
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -24,4 +25,6 @@ public class Room {
     public void setDescription(String description) { this.description = description; }
     public int getHomestayId() { return homestayId; }
     public void setHomestayId(int homestayId) { this.homestayId = homestayId; }
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
 }
