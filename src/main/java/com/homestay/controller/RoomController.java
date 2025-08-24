@@ -25,7 +25,7 @@ public class RoomController {
     }
 
     @GetMapping("/homestays/{homestayId}/rooms")
-    public String listRoomsByHomestay(@PathVariable int homestayId, Model model) {
+    public String listRoomsByHomestay(@PathVariable("homestayId") int homestayId, Model model) {
         List<Room> rooms = roomService.getRoomsByHomestayId(homestayId);
         model.addAttribute("rooms", rooms);
         model.addAttribute("homestayId", homestayId);
@@ -34,7 +34,7 @@ public class RoomController {
 
     // Hiển thị danh sách phòng cho admin theo homestay
     @GetMapping("/admin/homestays/{homestayId}/rooms")
-    public String adminListRooms(@PathVariable int homestayId, Model model) {
+    public String adminListRooms(@PathVariable("homestayId") int homestayId, Model model) {
         List<Room> rooms = roomService.getRoomsByHomestayId(homestayId);
         model.addAttribute("rooms", rooms);
         model.addAttribute("homestayId", homestayId);
@@ -43,7 +43,7 @@ public class RoomController {
 
     // Hiển thị form thêm phòng
     @GetMapping("/admin/homestays/{homestayId}/rooms/add")
-    public String showAddRoomForm(@PathVariable int homestayId, Model model) {
+    public String showAddRoomForm(@PathVariable("homestayId") int homestayId, Model model) {
         Room room = new Room();
         room.setHomestayId(homestayId);
         model.addAttribute("room", room);
@@ -53,7 +53,7 @@ public class RoomController {
 
     // Xử lý thêm phòng
     @PostMapping("/admin/homestays/{homestayId}/rooms/add")
-    public String addRoom(@PathVariable int homestayId, @ModelAttribute Room room, @RequestParam("homestayId") int homestayIdParam) {
+    public String addRoom(@PathVariable("homestayId") int homestayId, @ModelAttribute("room") Room room, @RequestParam("homestayId") int homestayIdParam) {
         room.setHomestayId(homestayIdParam);
         roomService.addRoom(room);
         return "redirect:/admin/homestays/" + homestayIdParam + "/rooms";
@@ -61,7 +61,7 @@ public class RoomController {
 
     // Hiển thị form sửa phòng
     @GetMapping("/admin/homestays/{homestayId}/rooms/edit/{roomId}")
-    public String showEditRoomForm(@PathVariable int homestayId, @PathVariable int roomId, Model model) {
+    public String showEditRoomForm(@PathVariable("homestayId") int homestayId, @PathVariable("roomId") int roomId, Model model) {
         List<Room> rooms = roomService.getRoomsByHomestayId(homestayId);
         Room room = rooms.stream().filter(r -> r.getId() == roomId).findFirst().orElse(null);
         model.addAttribute("room", room);
@@ -71,7 +71,7 @@ public class RoomController {
 
     // Xử lý sửa phòng
     @PostMapping("/admin/homestays/{homestayId}/rooms/edit")
-    public String editRoom(@PathVariable int homestayId, @ModelAttribute Room room, @RequestParam("homestayId") int homestayIdParam) {
+    public String editRoom(@PathVariable("homestayId") int homestayId, @ModelAttribute("room") Room room, @RequestParam("homestayId") int homestayIdParam) {
         room.setHomestayId(homestayIdParam);
         roomService.updateRoom(room);
         return "redirect:/admin/homestays/" + homestayIdParam + "/rooms";
@@ -79,13 +79,13 @@ public class RoomController {
 
     // Xử lý xóa phòng
     @GetMapping("/admin/homestays/{homestayId}/rooms/delete/{roomId}")
-    public String deleteRoom(@PathVariable int homestayId, @PathVariable int roomId) {
+    public String deleteRoom(@PathVariable("homestayId") int homestayId, @PathVariable("roomId") int roomId) {
         roomService.deleteRoom(roomId);
         return "redirect:/admin/homestays/" + homestayId + "/rooms";
     }
 
     @GetMapping("/homestays/{homestayId}/rooms/{roomId}")
-    public String viewRoomDetail(@PathVariable int homestayId, @PathVariable int roomId, Model model) {
+    public String viewRoomDetail(@PathVariable("homestayId") int homestayId, @PathVariable("roomId") int roomId, Model model) {
         List<Room> rooms = roomService.getRoomsByHomestayId(homestayId);
         Room room = rooms.stream().filter(r -> r.getId() == roomId).findFirst().orElse(null);
         if (room != null) {

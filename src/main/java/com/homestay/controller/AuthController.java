@@ -29,13 +29,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password, Model model, HttpSession session) {
+    public String login(@RequestParam("username") String username, @RequestParam("password") String password, Model model, HttpSession session) {
         User user = userService.login(username, password);
         if (user != null) {
-            // Lấy thông tin đầy đủ từ database
             User fullUser = userService.getUserById(user.getId());
             session.setAttribute("currentUser", fullUser);
-            return "redirect:/home";
+            if ("ADMIN".equals(fullUser.getRole())) {
+                return "redirect:/user/list"; // hoặc trang dashboard admin nếu có
+            } else if ("MANAGER".equals(fullUser.getRole())) {
+                return "redirect:/manager/dashboard";
+            } else {
+                return "redirect:/home";
+            }
         } else {
             model.addAttribute("error", "Sai tài khoản hoặc mật khẩu hoặc tài khoản bị khóa!");
             return "login";

@@ -75,6 +75,30 @@ public class HomestayDao {
         }
     }
 
+    public int createHomestay(Homestay h) {
+        String sql = "INSERT INTO homestays (name, address, phone, email, description, image) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, h.getName());
+            ps.setString(2, h.getAddress());
+            ps.setString(3, h.getPhone());
+            ps.setString(4, h.getEmail());
+            ps.setString(5, h.getDescription());
+            ps.setString(6, h.getImage());
+            int affected = ps.executeUpdate();
+            if (affected > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
     public void updateHomestay(Homestay h) {
         String sql = "UPDATE homestays SET name=?, address=?, phone=?, email=?, description=?, image=? WHERE id=?";
         try (Connection conn = dataSource.getConnection();

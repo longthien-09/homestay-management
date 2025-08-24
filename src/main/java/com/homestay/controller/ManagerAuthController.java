@@ -4,6 +4,8 @@ import com.homestay.model.Homestay;
 import com.homestay.model.User;
 import com.homestay.service.HomestayService;
 import com.homestay.service.UserService;
+import com.homestay.service.ServiceService;
+import com.homestay.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,47 +13,38 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
-@RequestMapping("/homestay-manager")
 public class ManagerAuthController {
     @Autowired
     private UserService userService;
     @Autowired
     private HomestayService homestayService;
+    @Autowired
+    private ServiceService serviceService;
+    @Autowired
+    private RoomService roomService;
 
-    @GetMapping("/login")
-    public String loginPage() { return "manager/login"; }
+    // Đã gộp login vào AuthController, không cần loginPage và login method ở đây nữa
 
-    @PostMapping("/login")
-    public String login(@RequestParam String username,
-                        @RequestParam String password,
-                        Model model,
-                        HttpSession session) {
-        User u = userService.login(username, password);
-        if (u != null && "MANAGER".equals(u.getRole())) {
-            session.setAttribute("currentUser", u);
-            return "redirect:/home";
-        }
-        model.addAttribute("error", "Sai tài khoản/mật khẩu hoặc không phải MANAGER");
-        return "manager/login";
-    }
-
-    @GetMapping("/register")
+    @GetMapping("/manager/register")
     public String registerPage() { return "manager/register"; }
 
-    @PostMapping("/register")
-    public String register(@RequestParam String username,
-                           @RequestParam String password,
-                           @RequestParam String fullName,
-                           @RequestParam String email,
-                           @RequestParam String phone,
-                           @RequestParam String homestayName,
-                           @RequestParam(required = false) String address,
-                           @RequestParam(required = false) String hsEmail,
-                           @RequestParam(required = false) String hsPhone,
+    @PostMapping("/manager/register")
+    public String register(@RequestParam("username") String username,
+                           @RequestParam("password") String password,
+                           @RequestParam("fullName") String fullName,
+                           @RequestParam("email") String email,
+                           @RequestParam("phone") String phone,
+                           @RequestParam("homestayName") String homestayName,
+                           @RequestParam(value = "address", required = false) String address,
+                           @RequestParam(value = "hsEmail", required = false) String hsEmail,
+                           @RequestParam(value = "hsPhone", required = false) String hsPhone,
                            Model model) {
         // Check username exists
         if (userService.getAllUsers().stream().anyMatch(u -> u.getUsername().equals(username))) {
@@ -89,6 +82,29 @@ public class ManagerAuthController {
         }
         
         model.addAttribute("message", "Đăng ký quản lý thành công. Vui lòng đăng nhập.");
-        return "manager/login";
+        return "redirect:/login";
     }
+
+    @GetMapping("/manager/dashboard")
+    public String dashboard(HttpSession session, Model model) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null || !"MANAGER".equals(currentUser.getRole())) {
+            return "redirect:/login";
+        }
+        Homestay homestay = null;
+        int roomCount = 0;
+        int bookingCount = 0;
+        if (currentUser.getHomestayId() != null) {
+            homestay = homestayService.getHomestayById(currentUser.getHomestayId());
+            roomCount = roomService.getRoomsByHomestayId(currentUser.getHomestayId()).size();
+            // bookingCount: cần bổ sung hàm đếm booking theo homestay nếu có, tạm để 0
+        }
+        int totalHomestay = homestayService.getAllHomestays().size();
+        model.addAttribute("homestay", homestay);
+        model.addAttribute("roomCount", roomCount);
+        model.addAttribute("bookingCount", bookingCount);
+        model.addAttribute("totalHomestay", totalHomestay);
+        return "manager/dashboard";
+    }
+
 }
