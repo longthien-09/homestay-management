@@ -26,8 +26,11 @@
         <% } else { %>
             <span class="user-pill"><%= currentUser.getFullName() != null ? currentUser.getFullName() : currentUser.getUsername() %> • <%= currentUser.getRole() %></span>
             <a href="<%=ctx%>/user/profile">Thông tin cá nhân</a>
-            <% if ("ADMIN".equals(currentUser.getRole())) { %>
-                <a href="<%=ctx%>/user/list">Quản lý người dùng</a>
+            <% if (currentUser != null && !"ADMIN".equals(currentUser.getRole())) { %>
+                <a href="<%=ctx%>/user/bookings">Lịch sử đặt phòng</a>
+            <% } %>
+            <% if (currentUser != null && "ADMIN".equals(currentUser.getRole())) { %>
+                <a href="<%=ctx%>/admin/bookings">Quản lý đặt phòng (Admin)</a>
             <% } %>
             <a href="<%=ctx%>/logout">Đăng xuất</a>
         <% } %>

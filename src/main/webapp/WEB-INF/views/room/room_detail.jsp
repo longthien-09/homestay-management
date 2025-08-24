@@ -251,7 +251,7 @@
                 <a href="/homestay-management/homestays/<%= homestayId %>/rooms" class="btn btn-secondary">← Quay lại danh sách phòng</a>
                 <a href="/homestay-management/homestays/<%= homestayId %>" class="btn btn-primary">🏠 Xem homestay</a>
                 <% if (room != null && "AVAILABLE".equals(room.getStatus())) { %>
-                <a href="#" class="btn btn-success">📅 Đặt phòng ngay</a>
+                <a href="/homestay-management/homestays/<%= homestayId %>/rooms/<%= room.getId() %>/book" class="btn btn-success">📅 Đặt phòng ngay</a>
                 <% } %>
             </div>
         </div>
