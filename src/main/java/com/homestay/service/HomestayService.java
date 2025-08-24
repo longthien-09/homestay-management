@@ -26,4 +26,7 @@ public class HomestayService {
     public boolean deleteHomestay(int id) {
         return homestayDao.deleteHomestay(id);
     }
+    public int createHomestay(Homestay h) {
+        return homestayDao.createHomestay(h);
+    }
 }

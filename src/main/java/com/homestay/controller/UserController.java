@@ -26,7 +26,7 @@ public class UserController {
     }
 
     @PostMapping("/profile")
-    public String updateProfile(@ModelAttribute User user, HttpSession session, Model model) {
+    public String updateProfile(@ModelAttribute("user") User user, HttpSession session, Model model) {
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) return "redirect:/login";
         user.setId(currentUser.getId());
@@ -52,7 +52,7 @@ public class UserController {
     }
 
     @PostMapping("/setActive")
-    public String setActive(@RequestParam int id, @RequestParam boolean active, HttpSession session) {
+    public String setActive(@RequestParam("id") int id, @RequestParam("active") boolean active, HttpSession session) {
         User user = (User) session.getAttribute("currentUser");
         if (user == null || !"ADMIN".equals(user.getRole())) return "redirect:/login";
         userService.setActive(id, active);

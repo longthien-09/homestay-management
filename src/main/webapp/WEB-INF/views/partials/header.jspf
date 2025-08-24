@@ -18,8 +18,8 @@
     <nav class="nav">
         <a href="<%=ctx%>/home">Trang chủ</a>
         <a href="<%=ctx%>/homestays">Homestays</a>
-        <a href="<%=ctx%>/services">Services</a>
-        <a class="cta" href="<%=ctx%>/homestay-manager/register">Đăng ký quản lý homestay</a>
+        <a href="#" id="openServiceModal">Services</a>
+        <a class="cta" href="<%=ctx%>/manager/register">Đăng ký quản lý homestay</a>
         <% if (currentUser == null) { %>
             <a href="<%=ctx%>/login">Đăng nhập</a>
             <a href="<%=ctx%>/register">Đăng ký</a>
@@ -34,3 +34,62 @@
     </nav>
 </header>
 <hr style="border:none; border-top:1px solid #eee; margin:0;"/>
+
+<!-- Modal chọn dịch vụ -->
+<div id="serviceModal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);align-items:center;justify-content:center;">
+  <div style="background:#fff;max-width:420px;width:90vw;margin:60px auto;padding:28px 24px 18px 24px;border-radius:10px;box-shadow:0 2px 16px #333;position:relative;">
+    <h3 style="margin-top:0;color:#2980b9;text-align:center;">Chọn dịch vụ</h3>
+    <form id="serviceSelectForm">
+      <div id="serviceListContainer" style="margin-bottom:18px;"></div>
+      <div style="text-align:center;">
+        <button type="button" id="closeServiceModal" style="background:#888;color:#fff;padding:8px 18px;border:none;border-radius:6px;margin-right:10px;">Đóng</button>
+        <button type="submit" style="background:#2980b9;color:#fff;padding:8px 18px;border:none;border-radius:6px;">Xác nhận</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+// Lấy homestayId từ URL nếu đang ở trang chi tiết homestay
+function getHomestayIdFromUrl() {
+  var match = window.location.pathname.match(/\/homestays\/(\d+)/);
+  return match ? match[1] : null;
+}
+
+// Mở modal và load dịch vụ
+function openServiceModal() {
+  var homestayId = getHomestayIdFromUrl();
+  if (!homestayId) {
+    alert('Bạn cần vào trang chi tiết homestay để chọn dịch vụ!');
+    return;
+  }
+  document.getElementById('serviceModal').style.display = 'flex';
+  // Gọi AJAX lấy dịch vụ
+  fetch('/homestay-management/homestays/' + homestayId + '/services/json')
+    .then(res => res.json())
+    .then(data => {
+      var html = '';
+      if (data.length === 0) {
+        html = '<div style="color:#888;text-align:center;">Chưa có dịch vụ nào!</div>';
+      } else {
+        data.forEach(function(s) {
+          html += '<div style="margin-bottom:8px;"><label><input type="checkbox" name="serviceIds" value="' + s.id + '"> ' + s.name + ' <span style="color:#27ae60;">₫' + s.price + '</span><br><span style="color:#888;font-size:0.95em;">' + (s.description || '') + '</span></label></div>';
+        });
+      }
+      document.getElementById('serviceListContainer').innerHTML = html;
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('openServiceModal');
+  if (btn) btn.addEventListener('click', function(e) { e.preventDefault(); openServiceModal(); });
+  document.getElementById('closeServiceModal').onclick = function() {
+    document.getElementById('serviceModal').style.display = 'none';
+  };
+  document.getElementById('serviceSelectForm').onsubmit = function(e) {
+    e.preventDefault();
+    var checked = Array.from(document.querySelectorAll('input[name="serviceIds"]:checked')).map(cb => cb.value);
+    alert('Bạn đã chọn dịch vụ: ' + checked.join(', '));
+    document.getElementById('serviceModal').style.display = 'none';
+  };
+});
+</script>

@@ -34,7 +34,7 @@ public class AdminController {
     }
 
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable int id, Model model) {
+    public String showEditForm(@PathVariable("id") int id, Model model) {
         Homestay homestay = homestayService.getHomestayById(id);
         model.addAttribute("homestay", homestay);
         return "homestay/homestay_form";
@@ -47,7 +47,7 @@ public class AdminController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteHomestay(@PathVariable int id, Model model) {
+    public String deleteHomestay(@PathVariable("id") int id, Model model) {
         boolean success = homestayService.deleteHomestay(id);
         if (success) {
             System.out.println("Xóa homestay thành công với id: " + id);
