@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.List, java.util.Map, com.homestay.model.Room" %>
+<%@ page import="java.util.List, java.util.Map, com.homestay.model.Room, com.homestay.model.Service" %>
 <%@ include file="../partials/header.jsp" %>
 <%! private String formatPrice(java.math.BigDecimal price) { 
     if (price == null) return "0₫";
@@ -168,7 +168,7 @@
                 <% } %>
                 <div class="price-row total">
                     <span>Tổng tiền:</span>
-                    <span><%= formatPrice(totalAmount != null ? totalAmount : payment.get("amount")) %></span>
+                    <span><%= formatPrice(totalAmount != null ? totalAmount : (payment.get("amount") != null ? (java.math.BigDecimal)payment.get("amount") : null)) %></span>
                 </div>
             </div>
             

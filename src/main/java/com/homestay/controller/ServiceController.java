@@ -158,7 +158,8 @@ public class ServiceController {
                 .getActiveBookingsByUser(currentUser.getId());
         if (bookings == null || bookings.isEmpty()) {
             model.addAttribute("error", "Bạn cần có đặt phòng trước khi chọn dịch vụ.");
-            return "booking/history";
+            model.addAttribute("message", "Bạn cần có đặt phòng trước khi chọn dịch vụ.");
+            return "service/service_booking_form";
         }
         // Xác định homestayId mục tiêu
         Integer targetHomestayId = homestayId;
