@@ -28,7 +28,14 @@ public class PaymentDao {
         List<Map<String,Object>> list = new ArrayList<>();
         if (homestayIds == null || homestayIds.isEmpty()) return list;
         String inClause = String.join(",", Collections.nCopies(homestayIds.size(), "?"));
-        String sql = "SELECT p.*, b.user_id, r.homestay_id FROM payments p JOIN bookings b ON p.booking_id=b.id JOIN rooms r ON b.room_id=r.id WHERE r.homestay_id IN ("+inClause+") ORDER BY p.payment_date DESC";
+        String sql = "SELECT p.*, b.user_id, u.full_name AS user_name, u.username, r.homestay_id, h.name AS homestay_name, r.room_number " +
+                    "FROM payments p " +
+                    "JOIN bookings b ON p.booking_id=b.id " +
+                    "JOIN users u ON b.user_id=u.id " +
+                    "JOIN rooms r ON b.room_id=r.id " +
+                    "JOIN homestays h ON r.homestay_id=h.id " +
+                    "WHERE r.homestay_id IN ("+inClause+") " +
+                    "ORDER BY p.payment_date DESC";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             for (int i=0;i<homestayIds.size();i++) ps.setInt(i+1, homestayIds.get(i));

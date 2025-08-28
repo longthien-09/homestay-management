@@ -45,8 +45,12 @@ public class PaymentController {
     public String pay(@PathVariable int id, @RequestParam(value = "method", required = false) String method, HttpSession session) {
         User user = (User) session.getAttribute("currentUser");
         if (user == null) return "redirect:/login";
+        
+        // Thực hiện thanh toán
         paymentService.pay(id, user.getId(), method);
-        return "redirect:/user/payments/" + id + "/pay";
+        
+        // Sau khi thanh toán thành công, redirect về danh sách thanh toán với thông báo
+        return "redirect:/user/payments?success=true&paymentId=" + id;
     }
 
     @GetMapping("/user/payments/{id}/pay")
@@ -117,5 +121,15 @@ public class PaymentController {
         List<Map<String,Object>> payments = paymentService.getPaymentsByHomestayIds(homestayIds);
         model.addAttribute("payments", payments);
         return "payment/manager_payment_list";
+    }
+
+    // Manager: xác nhận thanh toán
+    @PostMapping("/manager/payments/{id}/confirm")
+    public String confirmPayment(@PathVariable int id, HttpSession session) {
+        User user = (User) session.getAttribute("currentUser");
+        if (user == null || !"MANAGER".equals(user.getRole())) return "redirect:/login";
+        
+        paymentService.confirmPayment(id);
+        return "redirect:/manager/payments?success=true&paymentId=" + id;
     }
 }

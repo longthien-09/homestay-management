@@ -126,7 +126,7 @@
     function onMethodChange(sel) {
         var bank = document.getElementById('bank-instructions');
         var qr = document.getElementById('qr-box');
-        if (sel.value === 'BANK') {
+        if (sel.value === 'BANK_TRANSFER') {
             bank.style.display = 'block';
             qr.style.display = 'block';
         } else {
@@ -210,7 +210,7 @@
                     <label for="method">Phương thức thanh toán:</label>
                     <select id="method" name="method" required onchange="onMethodChange(this)">
                         <option value="CASH">Tiền mặt tại homestay</option>
-                        <option value="BANK">Chuyển khoản ngân hàng</option>
+                        <option value="BANK_TRANSFER">Chuyển khoản ngân hàng</option>
                     </select>
                 </div>
                 <div id="bank-instructions" class="pay-instructions" style="display:none;">
