@@ -1,6 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.*, java.math.BigDecimal" %>
 <%@ include file="../partials/header.jsp" %>
+<%! private String formatPrice(java.math.BigDecimal price) { 
+    if (price == null) return "0₫";
+    return String.format("%,.0f₫", price.doubleValue()).replace(",", ".");
+} %>
 <%
     Map<String, Object> overviewStats = (Map<String, Object>) request.getAttribute("overviewStats");
     List<Map<String, Object>> monthlyRevenue = (List<Map<String, Object>>) request.getAttribute("monthlyRevenue");
@@ -37,8 +41,7 @@
         <div class="stat-box">
             <div class="icon"><i class="fa-solid fa-sack-dollar"></i></div>
             <div class="label">Tổng doanh thu</div>
-            <div class="value">₫<%= overviewStats != null && overviewStats.get("totalRevenue") != null ? 
-                String.format("%,.0f", ((java.math.BigDecimal)overviewStats.get("totalRevenue")).doubleValue()) : "0" %></div>
+            <div class="value"><%= formatPrice((java.math.BigDecimal)overviewStats.get("totalRevenue")) %></div>
         </div>
         <div class="stat-box">
             <div class="icon"><i class="fa-solid fa-calendar-check"></i></div>

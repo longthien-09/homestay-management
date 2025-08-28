@@ -1,6 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List, com.homestay.model.Service" %>
 <%@ include file="../partials/header.jsp" %>
+<%! private String formatPrice(java.math.BigDecimal price) { 
+    if (price == null) return "0₫";
+    return String.format("%,.0f₫", price.doubleValue()).replace(",", ".");
+} %>
 <%
     Integer homestayId = (Integer) request.getAttribute("homestayId");
     Integer roomId = (Integer) request.getAttribute("roomId");
@@ -94,7 +98,7 @@
                                     <label for="service_<%= service.getId() %>">
                                         <%= service.getName() %>
                                         <% if (service.getPrice() != null) { %>
-                                            <span class="service-price">(+₫<%= service.getPrice() %>)</span>
+                                            <span class="service-price">(+<%= formatPrice(service.getPrice()) %>)</span>
                                         <% } %>
                                     </label>
                                 </div>

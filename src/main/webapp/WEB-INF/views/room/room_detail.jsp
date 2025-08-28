@@ -1,10 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="com.homestay.model.Room" %>
+<%@ page import="com.homestay.model.Room, com.homestay.model.Homestay" %>
 <%
     Room room = (Room) request.getAttribute("room");
     int homestayId = (request.getAttribute("homestayId") != null) ? (Integer) request.getAttribute("homestayId") : 0;
 %>
 <%@ include file="../partials/header.jsp" %>
+<%! private String formatPrice(java.math.BigDecimal price) { 
+    if (price == null) return "0₫";
+    return String.format("%,.0f₫", price.doubleValue()).replace(",", ".");
+} %>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -199,7 +203,7 @@
             
             <div class="price-section">
                 <h3>💰 Giá phòng</h3>
-                <p class="price-amount">₫<%= room != null && room.getPrice() != null ? room.getPrice() : "0" %></p>
+                <p class="price-amount"><%= formatPrice(room != null ? room.getPrice() : null) %></p>
             </div>
             
             <div class="status-section">

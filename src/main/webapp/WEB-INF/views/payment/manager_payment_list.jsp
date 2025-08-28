@@ -1,6 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.*" %>
+<%@ page import="java.util.List, java.util.Map" %>
 <%@ include file="../partials/header.jsp" %>
+<%! private String formatPrice(java.math.BigDecimal price) { 
+    if (price == null) return "0₫";
+    return String.format("%,.0f₫", price.doubleValue()).replace(",", ".");
+} %>
 <%
     List<Map<String,Object>> payments = (List<Map<String,Object>>) request.getAttribute("payments");
 %>
@@ -47,7 +51,7 @@
                     <td><%= i++ %></td>
                     <td>#<%= p.get("booking_id") %></td>
                     <td><%= p.get("user_name") != null ? p.get("user_name") : "-" %></td>
-                    <td>₫<%= p.get("amount") %></td>
+                    <td><%= formatPrice((java.math.BigDecimal)p.get("amount")) %></td>
                     <td><%= p.get("payment_date") != null ? p.get("payment_date") : "-" %></td>
                     <td><%= p.get("method") != null ? p.get("method") : "-" %></td>
                     <td><span class="badge badge-<%= p.get("status") %>"><%= p.get("status") %></span></td>
