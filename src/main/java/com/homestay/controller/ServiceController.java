@@ -194,15 +194,24 @@ public class ServiceController {
             for (Integer id : serviceIds) idsAsString.add(String.valueOf(id));
             session.setAttribute("selectedServices_" + bookingId, idsAsString);
         }
-        // Điều hướng sang trang thanh toán của booking này
+        
+        // Luôn tạo payment mới cho dịch vụ để user có thể thanh toán
         com.homestay.service.PaymentService paymentService = (com.homestay.service.PaymentService)
                 org.springframework.web.context.ContextLoader.getCurrentWebApplicationContext().getBean("paymentService");
-        java.util.Map<String,Object> payment = paymentService.getLatestPaymentByBooking(bookingId);
-        if (payment != null) {
-            return "redirect:/user/payments/" + payment.get("id") + "/pay?origin=service";
+        
+        // Tính tổng tiền dịch vụ
+        java.math.BigDecimal totalServiceAmount = java.math.BigDecimal.ZERO;
+        if (serviceIds != null && !serviceIds.isEmpty()) {
+            for (Integer serviceId : serviceIds) {
+                com.homestay.model.Service service = serviceService.getServiceById(serviceId);
+                if (service != null && service.getPrice() != null) {
+                    totalServiceAmount = totalServiceAmount.add(service.getPrice());
+                }
+            }
         }
-        // Nếu chưa có payment, tạo mới với số tiền 0 và chuyển tới
-        int newPaymentId = paymentService.createPayment(bookingId, java.math.BigDecimal.ZERO);
+        
+        // Tạo payment mới với số tiền dịch vụ
+        int newPaymentId = paymentService.createPayment(bookingId, totalServiceAmount);
         return "redirect:/user/payments/" + newPaymentId + "/pay?origin=service";
     }
 

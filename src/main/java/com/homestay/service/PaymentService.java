@@ -30,9 +30,14 @@ public class PaymentService {
             int bookingId = (int) payment.get("booking_id");
             com.homestay.model.Booking booking = bookingDao.findById(bookingId);
             if (booking != null && booking.getUserId() == userId) {
-                paymentDao.updateStatusAndMethod(paymentId, "PAID", method);
+                // Chuyển thành PENDING thay vì PAID
+                paymentDao.updateStatusAndMethod(paymentId, "PENDING", method);
             }
         }
+    }
+
+    public void confirmPayment(int paymentId) {
+        paymentDao.updateStatus(paymentId, "PAID");
     }
 
     public int createPayment(int bookingId, java.math.BigDecimal amount) {
