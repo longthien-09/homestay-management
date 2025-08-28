@@ -75,6 +75,22 @@ public class BookingController {
                 model.addAttribute("error", "Ngày trả phải sau ngày nhận.");
                 model.addAttribute("homestayId", homestayId);
                 model.addAttribute("roomId", roomId);
+                // Giữ lại dịch vụ đã chọn từ session
+                if (selectedServices != null && !selectedServices.isEmpty()) {
+                    model.addAttribute("selectedServices", selectedServices);
+                    // Lấy thông tin dịch vụ để hiển thị
+                    java.util.List<com.homestay.model.Service> services = new java.util.ArrayList<>();
+                    for (String serviceId : selectedServices) {
+                        try {
+                            com.homestay.model.Service service = serviceService.getServiceById(Integer.parseInt(serviceId));
+                            if (service != null) services.add(service);
+                        } catch (NumberFormatException ignore) {}
+                    }
+                    model.addAttribute("services", services);
+                }
+                // Load lại dịch vụ của homestay để user có thể chọn lại
+                java.util.List<com.homestay.model.Service> homestayServices = serviceService.getServicesByHomestayId(homestayId);
+                model.addAttribute("homestayServices", homestayServices);
                 return "booking/NewFile";
             }
             int bookingId = bookingService.requestBooking(user.getId(), roomId, ci, co);
@@ -82,6 +98,22 @@ public class BookingController {
                 model.addAttribute("error", "Phòng không còn trống trong khoảng thời gian đã chọn.");
                 model.addAttribute("homestayId", homestayId);
                 model.addAttribute("roomId", roomId);
+                // Giữ lại dịch vụ đã chọn từ session
+                if (selectedServices != null && !selectedServices.isEmpty()) {
+                    model.addAttribute("selectedServices", selectedServices);
+                    // Lấy thông tin dịch vụ để hiển thị
+                    java.util.List<com.homestay.model.Service> services = new java.util.ArrayList<>();
+                    for (String serviceId : selectedServices) {
+                        try {
+                            com.homestay.model.Service service = serviceService.getServiceById(Integer.parseInt(serviceId));
+                            if (service != null) services.add(service);
+                        } catch (NumberFormatException ignore) {}
+                    }
+                    model.addAttribute("services", services);
+                }
+                // Load lại dịch vụ của homestay để user có thể chọn lại
+                java.util.List<com.homestay.model.Service> homestayServices = serviceService.getServicesByHomestayId(homestayId);
+                model.addAttribute("homestayServices", homestayServices);
                 return "booking/NewFile";
             }
             
