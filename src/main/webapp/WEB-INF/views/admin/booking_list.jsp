@@ -1,5 +1,6 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.*" %>
+<%@ include file="../partials/header.jsp" %>
 <%
     List<Map<String,Object>> bookings = (List<Map<String,Object>>) request.getAttribute("bookings");
     Integer homestayId = (Integer) request.getAttribute("homestayId");
@@ -11,7 +12,7 @@
     <meta charset="UTF-8">
     <title>Quản lý đặt phòng (Admin)</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f6f8fb; margin: 0; padding: 20px; }
+        body { font-family: Arial, sans-serif; background: #f6f8fb; margin: 0; padding: 0; }
         .card { max-width: 1100px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); overflow: hidden; }
         .header { background: linear-gradient(135deg,#ff7eb3,#ff758c); color: #fff; padding: 24px; }
         .content { padding: 24px; }
@@ -116,5 +117,6 @@
         </table>
     </div>
 </div>
+<%@ include file="../partials/footer.jsp" %>
 </body>
 </html>

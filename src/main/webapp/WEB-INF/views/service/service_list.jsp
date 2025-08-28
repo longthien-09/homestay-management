@@ -1,8 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.List, com.homestay.model.Service" %>
-<%@ include file="../partials/header.jspf" %>
+<%@ page import="java.util.List, com.homestay.model.Service, com.homestay.model.Homestay" %>
+<%@ include file="../partials/header.jsp" %>
 <%
     List<Service> services = (List<Service>) request.getAttribute("services");
+    List<Homestay> homestayOptions = (List<Homestay>) request.getAttribute("homestayOptions");
+    Integer homestayId = (request.getAttribute("homestayId") != null) ? (Integer) request.getAttribute("homestayId") : null;
 %>
 <!DOCTYPE html>
 <html>
@@ -10,7 +12,7 @@
     <meta charset="UTF-8">
     <title>Quản lý dịch vụ - Manager</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f7f7f7; }
+        body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
         .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px #ccc; padding: 32px; }
         h2 { color: #2c3e50; text-align: center; margin-bottom: 30px; }
         .btn-add { background: #27ae60; color: #fff; padding: 10px 22px; border-radius: 6px; font-weight: bold; text-decoration: none; margin-bottom: 18px; display: inline-block; }
@@ -28,7 +30,20 @@
 <body>
 <div class="container">
     <h2>Quản lý dịch vụ Homestay</h2>
-    <a class="btn-add" href="/homestay-management/manager/services/add">+ Thêm dịch vụ mới</a>
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+        <a class="btn-add" href="/homestay-management/manager/services/add">+ Thêm dịch vụ mới</a>
+        <div>
+            <label for="hsSelect" style="font-weight:600; color:#2c3e50; margin-right:8px;">Homestay:</label>
+            <select id="hsSelect" style="padding:8px 10px; border:1px solid #dce1eb; border-radius:8px; min-width:260px;">
+                <% if (homestayOptions != null) {
+                       for (Homestay h : homestayOptions) { %>
+                    <option value="<%= h.getId() %>" <%= (homestayId != null && homestayId == h.getId()) ? "selected" : "" %>><%= h.getName() != null ? h.getName() : ("#"+h.getId()) %></option>
+                <%   }
+                   }
+                %>
+            </select>
+        </div>
+    </div>
     <table border="1">
         <tr>
             <th>ID</th>
@@ -53,6 +68,17 @@
         <% } %>
     </table>
 </div>
-<%@ include file="../partials/footer.jspf" %>
+<script>
+(function(){
+  var sel = document.getElementById('hsSelect');
+  if (!sel) return;
+  sel.addEventListener('change', function(){
+    var id = this.value;
+    if (!id) return;
+    window.location.href = '/homestay-management/manager/services?homestayId=' + id;
+  });
+})();
+</script>
+<%@ include file="../partials/footer.jsp" %>
 </body>
 </html>

@@ -1,9 +1,10 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.homestay.model.User, com.homestay.model.Homestay" %>
-<%@ include file="../partials/header.jspf" %>
+<%@ include file="../partials/header.jsp" %>
 <%
     // Đã có biến currentUser từ header.jspf, không khai báo lại ở đây
-    Homestay homestay = (Homestay) request.getAttribute("homestay");
+    java.util.List<com.homestay.model.Homestay> homestays = (java.util.List<com.homestay.model.Homestay>) request.getAttribute("homestays");
+    java.util.Map<Integer, java.util.List<com.homestay.model.Room>> roomsByHomestay = (java.util.Map<Integer, java.util.List<com.homestay.model.Room>>) request.getAttribute("roomsByHomestay");
     int roomCount = request.getAttribute("roomCount") != null ? (Integer) request.getAttribute("roomCount") : 0;
     int bookingCount = request.getAttribute("bookingCount") != null ? (Integer) request.getAttribute("bookingCount") : 0;
     int totalHomestay = request.getAttribute("totalHomestay") != null ? (Integer) request.getAttribute("totalHomestay") : 0;
@@ -14,7 +15,7 @@
     <meta charset="UTF-8">
     <title>Manager Dashboard - Homestay Management</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6fb; margin: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6fb; margin: 0; padding: 0; }
         .dashboard-container {
             max-width: 1200px;
             margin: 40px auto 0 auto;
@@ -103,69 +104,54 @@
     <div class="stats">
         <div class="stat-card">
             <div class="icon"><i class="fa-solid fa-house"></i></div>
-            <div class="label">Homestay của bạn <span style="font-size:0.95em;color:#888;">(Tổng: <%= totalHomestay %>)</span></div>
-            <div class="value"><%= homestay != null ? homestay.getName() : "Chưa gán" %></div>
+            <div class="label">Homestay bạn quản lý</div>
+            <div class="value"><%= homestays != null ? homestays.size() : 0 %></div>
         </div>
         <div class="stat-card">
             <div class="icon"><i class="fa-solid fa-bed"></i></div>
             <div class="label">Số phòng</div>
-            <div class="value"><%= roomCount %></div>
-        </div>
-        <div class="stat-card">
-            <div class="icon"><i class="fa-solid fa-calendar-check"></i></div>
-            <div class="label">Lượt đặt phòng</div>
-            <div class="value"><%= bookingCount %></div>
+            <div class="value">(Xem chi tiết trong danh sách homestay)</div>
         </div>
     </div>
     <div class="quick-actions">
         <div class="action-card">
             <div class="icon"><i class="fa-solid fa-house"></i></div>
             <div class="title">Quản lý Homestay</div>
-            <div class="desc">Xem danh sách tất cả homestay trong hệ thống.</div>
-            <a href="/homestay-management/admin/homestays">Quản lý homestay</a>
+            <div class="desc">Xem danh sách homestay bạn quản lý.</div>
+            <a href="/homestay-management/manager/homestays">Xem danh sách homestay</a>
         </div>
         <div class="action-card">
             <div class="icon"><i class="fa-solid fa-bed"></i></div>
             <div class="title">Quản lý phòng</div>
             <div class="desc">Thêm, sửa, xóa và xem danh sách phòng thuộc homestay của bạn.</div>
-            <a href="/homestay-management/homestays/<%= homestay != null ? homestay.getId() : 0 %>/rooms">Xem phòng</a>
+            <a href="/homestay-management/manager/homestays/<%= (homestays != null && !homestays.isEmpty()) ? homestays.get(0).getId() : 0 %>/rooms">Xem phòng</a>
         </div>
         <div class="action-card">
             <div class="icon"><i class="fa-solid fa-calendar-check"></i></div>
             <div class="title">Quản lý đặt phòng</div>
             <div class="desc">Xem và xác nhận các lượt đặt phòng của khách.</div>
-            <a href="#">Xem đặt phòng</a>
+            <a href="/homestay-management/manager/bookings">Xem đặt phòng</a>
         </div>
         <div class="action-card">
             <div class="icon"><i class="fa-solid fa-concierge-bell"></i></div>
             <div class="title">Quản lý dịch vụ</div>
             <div class="desc">Thêm, sửa, xóa các dịch vụ tiện ích cho homestay.</div>
-            <a href="#">Quản lý dịch vụ</a>
+            <a href="/homestay-management/manager/services">Quản lý dịch vụ</a>
         </div>
         <div class="action-card">
-            <div class="icon"><i class="fa-solid fa-user"></i></div>
-            <div class="title">Thông tin cá nhân</div>
-            <div class="desc">Cập nhật thông tin quản lý, đổi mật khẩu.</div>
-            <a href="/homestay-management/user/profile">Cá nhân</a>
+            <div class="icon"><i class="fa-solid fa-money-check-dollar"></i></div>
+            <div class="title">Quản lý thanh toán</div>
+            <div class="desc">Xem trạng thái thanh toán của các booking thuộc homestay bạn quản lý.</div>
+            <a href="/homestay-management/manager/payments">Quản lý thanh toán</a>
         </div>
-    </div>
-    <div class="homestay-info">
-        <div class="img">
-            <% if (homestay != null && homestay.getImage() != null && !homestay.getImage().trim().isEmpty()) { %>
-                <img src="<%= homestay.getImage() %>" alt="Homestay" style="width:100%;height:100%;object-fit:cover;border-radius:8px;"/>
-            <% } else { %>
-                <i class="fa-solid fa-house"></i>
-            <% } %>
-        </div>
-        <div class="details">
-            <h2><%= homestay != null ? homestay.getName() : "Chưa có homestay" %></h2>
-            <div class="meta"><b>Địa chỉ:</b> <%= homestay != null && homestay.getAddress() != null ? homestay.getAddress() : "Chưa cập nhật" %></div>
-            <div class="meta"><b>Email:</b> <%= homestay != null && homestay.getEmail() != null ? homestay.getEmail() : "Chưa cập nhật" %></div>
-            <div class="meta"><b>Số điện thoại:</b> <%= homestay != null && homestay.getPhone() != null ? homestay.getPhone() : "Chưa cập nhật" %></div>
-            <div class="desc"><b>Mô tả:</b> <%= homestay != null && homestay.getDescription() != null ? homestay.getDescription() : "Chưa có mô tả." %></div>
+        <div class="action-card">
+            <div class="icon"><i class="fa-solid fa-chart-bar"></i></div>
+            <div class="title">Báo cáo thống kê</div>
+            <div class="desc">Xem tổng quan doanh thu, lượt đặt phòng, dịch vụ,... của homestay bạn quản lý.</div>
+            <a href="/homestay-management/manager/statistics">Xem thống kê</a>
         </div>
     </div>
 </div>
-<%@ include file="../partials/footer.jspf" %>
+<%@ include file="../partials/footer.jsp" %>
 </body>
 </html>

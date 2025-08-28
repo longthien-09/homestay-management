@@ -1,4 +1,4 @@
-CREATE DATABASE  IF NOT EXISTS `homestay_management` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE  IF NOT EXISTS `homestay_management` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `homestay_management`;
 -- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
 --
@@ -18,6 +18,32 @@ USE `homestay_management`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `booking_services`
+--
+
+DROP TABLE IF EXISTS `booking_services`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `booking_services` (
+  `booking_id` int NOT NULL,
+  `service_id` int NOT NULL,
+  PRIMARY KEY (`booking_id`,`service_id`),
+  KEY `service_id` (`service_id`),
+  CONSTRAINT `booking_services_ibfk_1` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`),
+  CONSTRAINT `booking_services_ibfk_2` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `booking_services`
+--
+
+LOCK TABLES `booking_services` WRITE;
+/*!40000 ALTER TABLE `booking_services` DISABLE KEYS */;
+/*!40000 ALTER TABLE `booking_services` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `bookings`
 --
 
@@ -30,14 +56,14 @@ CREATE TABLE `bookings` (
   `room_id` int NOT NULL,
   `check_in` date NOT NULL,
   `check_out` date NOT NULL,
-  `status` enum('PENDING','CONFIRMED','CANCELLED') DEFAULT 'PENDING',
+  `status` enum('PENDING','CONFIRMED','CANCELLED') COLLATE utf8mb4_unicode_ci DEFAULT 'PENDING',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `room_id` (`room_id`),
   CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `bookings_ibfk_2` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -58,13 +84,14 @@ DROP TABLE IF EXISTS `homestays`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `homestays` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `address` varchar(255) DEFAULT NULL,
-  `phone` varchar(20) DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `description` text,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` mediumtext COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -74,6 +101,32 @@ CREATE TABLE `homestays` (
 LOCK TABLES `homestays` WRITE;
 /*!40000 ALTER TABLE `homestays` DISABLE KEYS */;
 /*!40000 ALTER TABLE `homestays` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `manager_homestays`
+--
+
+DROP TABLE IF EXISTS `manager_homestays`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `manager_homestays` (
+  `user_id` int NOT NULL,
+  `homestay_id` int NOT NULL,
+  PRIMARY KEY (`user_id`,`homestay_id`),
+  KEY `homestay_id` (`homestay_id`),
+  CONSTRAINT `manager_homestays_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `manager_homestays_ibfk_2` FOREIGN KEY (`homestay_id`) REFERENCES `homestays` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `manager_homestays`
+--
+
+LOCK TABLES `manager_homestays` WRITE;
+/*!40000 ALTER TABLE `manager_homestays` DISABLE KEYS */;
+/*!40000 ALTER TABLE `manager_homestays` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -88,12 +141,12 @@ CREATE TABLE `payments` (
   `booking_id` int NOT NULL,
   `amount` decimal(10,2) NOT NULL,
   `payment_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `method` enum('CASH','CREDIT_CARD','BANK_TRANSFER') DEFAULT NULL,
-  `status` enum('PAID','UNPAID') DEFAULT 'UNPAID',
+  `method` enum('CASH','CREDIT_CARD','BANK_TRANSFER') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` enum('PAID','UNPAID') COLLATE utf8mb4_unicode_ci DEFAULT 'UNPAID',
   PRIMARY KEY (`id`),
   KEY `booking_id` (`booking_id`),
   CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -114,16 +167,17 @@ DROP TABLE IF EXISTS `rooms`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `rooms` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `room_number` varchar(50) NOT NULL,
-  `type` varchar(100) DEFAULT NULL,
+  `room_number` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `price` decimal(10,2) NOT NULL,
-  `status` enum('AVAILABLE','BOOKED','MAINTENANCE') DEFAULT 'AVAILABLE',
-  `description` text,
+  `status` enum('AVAILABLE','BOOKED','MAINTENANCE') COLLATE utf8mb4_unicode_ci DEFAULT 'AVAILABLE',
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` mediumtext COLLATE utf8mb4_unicode_ci,
   `homestay_id` int NOT NULL,
   PRIMARY KEY (`id`),
   KEY `homestay_id` (`homestay_id`),
   CONSTRAINT `rooms_ibfk_1` FOREIGN KEY (`homestay_id`) REFERENCES `homestays` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -144,14 +198,15 @@ DROP TABLE IF EXISTS `services`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `services` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `price` decimal(10,2) NOT NULL,
-  `description` text,
+  `description` mediumtext COLLATE utf8mb4_unicode_ci,
   `homestay_id` int NOT NULL,
+  `image_url` varchar(512) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `homestay_id` (`homestay_id`),
   CONSTRAINT `services_ibfk_1` FOREIGN KEY (`homestay_id`) REFERENCES `homestays` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -172,18 +227,16 @@ DROP TABLE IF EXISTS `users`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `username` varchar(100) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `full_name` varchar(255) DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `phone` varchar(20) DEFAULT NULL,
-  `role` enum('ADMIN','USER') NOT NULL,
-  `homestay_id` int DEFAULT NULL,
+  `username` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `full_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `role` enum('ADMIN','MANAGER','USER') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `active` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `username` (`username`),
-  KEY `homestay_id` (`homestay_id`),
-  CONSTRAINT `users_ibfk_1` FOREIGN KEY (`homestay_id`) REFERENCES `homestays` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -192,40 +245,9 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'thien','123','thienthien','thien@gmail.com','9355784124','USER',1),(2,'thien1','123','thienthien','thien@gmail.com','9355784124','MANAGER',1),(6,'thien11','1','áº»dfgh','thien@gmail.com','9355784124','MANAGER',1),(7,'thien14','1','áº»dfgh','thien@gmail.com','9355784124','MANAGER',1),(8,'thien15','1','áº»dfgh','thien@gmail.com','9355784124','MANAGER',1),(9,'thien16','1','áº»dfgh','thien@gmail.com','9355784124','MANAGER',1),(10,'thien17','1','áº»dfgh','thien@gmail.com','9355784124','MANAGER',1),(11,'thien18','1','áº»dfgh','thien@gmail.com','9355784124','MANAGER',1),(12,'Æ°','Æ°','f','12@gmail.com','12456789','MANAGER',1),(13,'v','v','v','12@gmail.com','12456789','MANAGER',1),(14,',',',',',','12@gmail.com','12456789','MANAGER',1),(15,'/','/','/','/@gmail.com','1234567890','MANAGER',1),(16,'\'','\'','\'','\'@gmail.com','123489','MANAGER',1),(17,'thien tháº§n','1234','thienthie','thien1@gmail.com','9355784124','USER',1),(18,'thien tháº§nn','1234','thienthie huá»³nh','thien1@gmail.com','9355784124','USER',1);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
-
--- Dữ liệu mẫu cho bảng homestays
-INSERT INTO homestays (name, address, phone, email, description) VALUES
-('Homestay A', '123 Đường A, Quận 1', '0909123456', 'a@homestay.com', 'Homestay trung tâm thành phố'),
-('Homestay B', '456 Đường B, Quận 2', '0909234567', 'b@homestay.com', 'Homestay gần sông');
-
--- Dữ liệu mẫu cho bảng users
-INSERT INTO users (username, password, full_name, email, phone, role, homestay_id) VALUES
-('admin', 'admin123', 'Quản trị viên', 'admin@homestay.com', '0909000000', 'ADMIN', NULL),
-('user1', 'user123', 'Nguyễn Văn A', 'user1@homestay.com', '0909111111', 'USER', 1),
-('user2', 'user123', 'Trần Thị B', 'user2@homestay.com', '0909222222', 'USER', 2);
-
--- Dữ liệu mẫu cho bảng rooms
-INSERT INTO rooms (room_number, type, price, status, description, homestay_id) VALUES
-('101', 'Deluxe', 500000, 'AVAILABLE', 'Phòng rộng, view đẹp', 1),
-('102', 'Standard', 300000, 'BOOKED', 'Phòng tiêu chuẩn', 1),
-('201', 'Suite', 800000, 'AVAILABLE', 'Phòng cao cấp', 2);
-
--- Dữ liệu mẫu cho bảng services
-INSERT INTO services (name, price, description, homestay_id) VALUES
-('Giặt ủi', 50000, 'Dịch vụ giặt ủi quần áo', 1),
-('Đưa đón sân bay', 200000, 'Dịch vụ đưa đón sân bay', 2);
-
--- Dữ liệu mẫu cho bảng bookings
-INSERT INTO bookings (user_id, room_id, check_in, check_out, status) VALUES
-(2, 1, '2024-08-01', '2024-08-03', 'CONFIRMED'),
-(3, 3, '2024-08-05', '2024-08-07', 'PENDING');
-
--- Dữ liệu mẫu cho bảng payments
-INSERT INTO payments (booking_id, amount, payment_date, method, status) VALUES
-(1, 1000000, '2024-08-01 10:00:00', 'CASH', 'PAID'),
-(2, 1600000, '2024-08-05 12:00:00', 'CREDIT_CARD', 'UNPAID');
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -236,5 +258,4 @@ INSERT INTO payments (booking_id, amount, payment_date, method, status) VALUES
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-08-21 17:44:31
-
+-- Dump completed on 2025-08-28 22:41:03

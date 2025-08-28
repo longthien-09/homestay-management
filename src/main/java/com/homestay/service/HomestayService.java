@@ -29,4 +29,32 @@ public class HomestayService {
     public int createHomestay(Homestay h) {
         return homestayDao.createHomestay(h);
     }
+    
+    public List<Homestay> getHomestaysByServiceName(String serviceName) {
+        return homestayDao.getHomestaysByServiceName(serviceName);
+    }
+    
+    public List<Homestay> getHomestaysByServiceNameWithPagination(String serviceName, int page, int size) {
+        return homestayDao.getHomestaysByServiceNameWithPagination(serviceName, page, size);
+    }
+    
+    public int getTotalHomestaysByServiceName(String serviceName) {
+        return homestayDao.getTotalHomestaysByServiceName(serviceName);
+    }
+    
+    public List<Homestay> getAllHomestaysWithPagination(int page, int size) {
+        return homestayDao.getAllHomestaysWithPagination(page, size);
+    }
+    
+    public int getTotalHomestays() {
+        return homestayDao.getTotalHomestays();
+    }
+
+    public java.util.List<Homestay> getRandomHomestays(int limit) {
+        return homestayDao.getRandomHomestays(limit);
+    }
+
+    public java.util.List<Homestay> search(String keyword, String roomType, java.math.BigDecimal minPrice, java.math.BigDecimal maxPrice) {
+        return homestayDao.search(keyword, roomType, minPrice, maxPrice);
+    }
 }

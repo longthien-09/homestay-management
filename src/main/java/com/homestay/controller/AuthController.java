@@ -71,7 +71,14 @@ public class AuthController {
     }
 
     @GetMapping("/home")
-    public String home() {
+    public String home(Model model) {
+        // Lấy 3 homestay ngẫu nhiên hiển thị nổi bật
+        java.util.List<com.homestay.model.Homestay> featured =
+                ((com.homestay.service.HomestayService) 
+                 org.springframework.web.context.ContextLoader
+                   .getCurrentWebApplicationContext()
+                   .getBean("homestayService")).getRandomHomestays(3);
+        model.addAttribute("featuredHomestays", featured);
         return "home";
     }
 }

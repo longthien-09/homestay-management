@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.homestay.model.Homestay" %>
-<%@ include file="../partials/header.jspf" %>
+<%@ include file="../partials/header.jsp" %>
 <%
     Homestay homestay = (Homestay) request.getAttribute("homestay");
 %>
@@ -169,7 +169,7 @@
                 <a href="/homestay-management/homestays" class="btn btn-secondary">← Quay lại danh sách</a>
                 <a href="/homestay-management/homestays/<%= homestay.getId() %>/rooms" class="btn btn-primary">🏠 Xem danh sách phòng</a>
                 <% if (session.getAttribute("currentUser") != null && "ADMIN".equals(((com.homestay.model.User)session.getAttribute("currentUser")).getRole())) { %>
-                <a href="/homestay-management/admin/homestays/edit/<%= homestay.getId() %>" class="btn btn-primary">✏️ Chỉnh sửa</a>
+                <a href="/homestay-management/manager/homestays/edit/<%= homestay.getId() %>" class="btn btn-primary">✏️ Chỉnh sửa</a>
                 <% } %>
             </div>
         </div>
@@ -178,5 +178,6 @@
     <div style="text-align: center; margin-top: 20px;">
         <a href="/homestay-management/home" class="back-link">← Về trang chủ</a>
     </div>
+    <%@ include file="../partials/footer.jsp" %>
 </body>
 </html>

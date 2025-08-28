@@ -1,6 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List, com.homestay.model.User" %>
+<%@ include file="../partials/header.jsp" %>
 <%
     List<User> users = (List<User>) request.getAttribute("users");
 %>
@@ -10,7 +10,7 @@
     <meta charset="UTF-8">
     <title>Quản lý người dùng</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f0f2f5; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
         .container { width: 900px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 30px; }
         h2 { text-align: center; color: #333; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -47,7 +47,6 @@
             <td><%= user.getEmail() %></td>
             <td><%= user.getPhone() %></td>
             <td><%= user.getRole() %></td>
-            <td><%= user.getHomestayId() %></td>
             <td><%= user.isActive() ? "Hoạt động" : "Đã khóa" %></td>
             <td>
                 <form method="post" action="/user/setActive" style="display:inline;">
@@ -64,5 +63,6 @@
         <% } %>
     </table>
 </div>
+<%@ include file="../partials/footer.jsp" %>
 </body>
 </html>

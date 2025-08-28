@@ -8,12 +8,11 @@ public class User {
     private String email;
     private String phone;
     private String role;
-    private Integer homestayId;
     private boolean active;
 
     public User() {}
 
-    public User(int id, String username, String password, String fullName, String email, String phone, String role, Integer homestayId, boolean active) {
+    public User(int id, String username, String password, String fullName, String email, String phone, String role, boolean active) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -21,7 +20,6 @@ public class User {
         this.email = email;
         this.phone = phone;
         this.role = role;
-        this.homestayId = homestayId;
         this.active = active;
     }
 
@@ -40,8 +38,6 @@ public class User {
     public void setPhone(String phone) { this.phone = phone; }
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
-    public Integer getHomestayId() { return homestayId; }
-    public void setHomestayId(Integer homestayId) { this.homestayId = homestayId; }
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
 }

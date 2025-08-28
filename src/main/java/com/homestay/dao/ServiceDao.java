@@ -41,9 +41,9 @@ public class ServiceDao {
         String sql = "INSERT INTO services (name, price, description, homestay_id) VALUES (?, ?, ?, ?)";
         try (java.sql.Connection conn = dataSource.getConnection();
              java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, service.getName());
+            ps.setString(1, n(service.getName()));
             ps.setBigDecimal(2, service.getPrice());
-            ps.setString(3, service.getDescription());
+            ps.setString(3, n(service.getDescription()));
             ps.setInt(4, service.getHomestayId());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -77,9 +77,9 @@ public class ServiceDao {
         String sql = "UPDATE services SET name=?, price=?, description=? WHERE id=?";
         try (java.sql.Connection conn = dataSource.getConnection();
              java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, service.getName());
+            ps.setString(1, n(service.getName()));
             ps.setBigDecimal(2, service.getPrice());
-            ps.setString(3, service.getDescription());
+            ps.setString(3, n(service.getDescription()));
             ps.setInt(4, service.getId());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -97,5 +97,34 @@ public class ServiceDao {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public List<Service> getAllServices() {
+        List<Service> services = new ArrayList<>();
+        String sql = "SELECT * FROM services";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Service s = new Service();
+                s.setId(rs.getInt("id"));
+                s.setName(rs.getString("name"));
+                s.setPrice(rs.getBigDecimal("price"));
+                s.setDescription(rs.getString("description"));
+                s.setHomestayId(rs.getInt("homestay_id"));
+                services.add(s);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return services;
+    }
+
+    private String n(String s) {
+        if (s == null) return null;
+        String t = s.trim();
+        if (t.isEmpty()) return null;
+        if ("null".equalsIgnoreCase(t)) return null;
+        return s;
     }
 }
