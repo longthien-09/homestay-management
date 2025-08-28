@@ -66,6 +66,38 @@
         .status-PAID { color: #28a745; }
         .status-UNPAID { color: #e67e22; }
         .form-group { margin-bottom: 18px; }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: #2c3e50; 
+            font-size: 1.05em; 
+        }
+        .form-group select { 
+            width: 100%; 
+            padding: 12px 16px; 
+            border: 2px solid #e9ecef; 
+            border-radius: 10px; 
+            font-size: 1em; 
+            background: #fff; 
+            color: #2c3e50; 
+            transition: all 0.3s ease; 
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+        .form-group select:focus { 
+            outline: none; 
+            border-color: #20c997; 
+            box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.1); 
+        }
+        .form-group select:hover { 
+            border-color: #20c997; 
+        }
         .btn {
             padding: 12px 28px; border-radius: 8px; border: none; background: linear-gradient(90deg,#20c997,#0dcaf0);
             color: #fff; font-weight: 700; font-size: 1.1em; cursor: pointer; box-shadow: 0 2px 8px #b2f0e6;

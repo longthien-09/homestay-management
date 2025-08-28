@@ -11,6 +11,11 @@
     String error = (String) request.getAttribute("error");
     String message = (String) request.getAttribute("message");
     List<Service> homestayServices = (List<Service>) request.getAttribute("homestayServices");
+    List<Service> services = (List<Service>) request.getAttribute("services");
+    List<String> selectedServices = (List<String>) request.getAttribute("selectedServices");
+    
+    // Sử dụng services nếu có, ngược lại dùng homestayServices
+    List<Service> availableServices = (services != null) ? services : homestayServices;
 %>
 <!DOCTYPE html>
 <html>
@@ -90,11 +95,12 @@
                 <!-- Phần dịch vụ -->
                 <div class="services-section">
                     <div class="services-title">🛎️ Dịch vụ bổ sung</div>
-                    <% if (homestayServices != null && !homestayServices.isEmpty()) { %>
+                    <% if (availableServices != null && !availableServices.isEmpty()) { %>
                         <div class="services-grid">
-                            <% for (Service service : homestayServices) { %>
+                            <% for (Service service : availableServices) { %>
                                 <div class="service-item">
-                                    <input type="checkbox" id="service_<%= service.getId() %>" name="selectedServices" value="<%= service.getId() %>" />
+                                    <input type="checkbox" id="service_<%= service.getId() %>" name="selectedServices" value="<%= service.getId() %>" 
+                                           <%= (selectedServices != null && selectedServices.contains(String.valueOf(service.getId()))) ? "checked" : "" %> />
                                     <label for="service_<%= service.getId() %>">
                                         <%= service.getName() %>
                                         <% if (service.getPrice() != null) { %>
