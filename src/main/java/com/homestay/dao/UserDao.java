@@ -26,15 +26,14 @@ public class UserDao {
             user.setEmail(rs.getString("email"));
             user.setPhone(rs.getString("phone"));
             user.setRole(rs.getString("role"));
-            user.setHomestayId((Integer)rs.getObject("homestay_id"));
             user.setActive(rs.getBoolean("active"));
             return user;
         }
     };
 
     public int register(User user) {
-        String sql = "INSERT INTO users (username, password, full_name, email, phone, role, homestay_id, active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)";
-        return jdbcTemplate.update(sql, user.getUsername(), user.getPassword(), user.getFullName(), user.getEmail(), user.getPhone(), user.getRole(), user.getHomestayId());
+        String sql = "INSERT INTO users (username, password, full_name, email, phone, role, active) VALUES (?, ?, ?, ?, ?, ?, 1)";
+        return jdbcTemplate.update(sql, user.getUsername(), user.getPassword(), user.getFullName(), user.getEmail(), user.getPhone(), user.getRole());
     }
 
     public User login(String username, String password) {

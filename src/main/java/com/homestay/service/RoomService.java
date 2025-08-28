@@ -27,4 +27,8 @@ public class RoomService {
     public boolean deleteRoom(int id) {
         return roomDao.deleteRoom(id);
     }
+
+    public com.homestay.model.Room getRoomById(int id) {
+        return roomDao.findById(id);
+    }
 }

@@ -26,4 +26,8 @@ public class ServiceService {
     public boolean deleteService(int id) {
         return serviceDao.deleteService(id);
     }
+
+    public java.util.List<com.homestay.model.Service> getAllServices() {
+        return serviceDao.getAllServices();
+    }
 }

@@ -1,15 +1,17 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.homestay.model.Homestay" %>
+<%@ include file="../partials/header.jsp" %>
 <%
     Homestay homestay = (Homestay) request.getAttribute("homestay");
     boolean isEdit = (homestay != null && homestay.getId() > 0);
 %>
+<%! private String nn(String s){ if(s==null) return ""; String t=s.trim(); return "null".equalsIgnoreCase(t)?"":s; } %>
 <html>
 <head>
     <meta charset="UTF-8">
     <title><%= isEdit ? "Sửa" : "Thêm" %> Homestay</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f7f7f7; }
+        body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
         h2 { color: #2c3e50; text-align: center; }
         form { background: #fff; max-width: 420px; margin: 30px auto; padding: 28px 32px 20px 32px; border-radius: 10px; box-shadow: 0 2px 10px #ccc; }
         label { display: block; margin-top: 12px; font-weight: bold; color: #34495e; }
@@ -23,29 +25,31 @@
 </head>
 <body>
     <h2><%= isEdit ? "Sửa" : "Thêm" %> Homestay</h2>
-    <form method="post" action="<%= isEdit ? "../edit" : "/homestay-management/admin/homestays/add" %>">
+    <form method="post" enctype="multipart/form-data" action="<%= isEdit ? "../edit" : "/homestay-management/manager/homestays/add" %>">
         <% if (isEdit) { %>
             <input type="hidden" name="id" value="<%= homestay.getId() %>" />
         <% } %>
         <label>Tên:</label>
-        <input type="text" name="name" value="<%= homestay != null ? homestay.getName() : "" %>" required/>
+        <input type="text" name="name" value="<%= homestay != null ? nn(homestay.getName()) : "" %>" required/>
         <label>Địa chỉ:</label>
-        <input type="text" name="address" value="<%= homestay != null ? homestay.getAddress() : "" %>" required/>
+        <input type="text" name="address" value="<%= homestay != null ? nn(homestay.getAddress()) : "" %>" required/>
         <label>Mô tả:</label>
-        <textarea name="description" required><%= homestay != null ? homestay.getDescription() : "" %></textarea>
-        <label>Link hình ảnh:</label>
-        <input type="text" name="image" value="<%= homestay != null ? homestay.getImage() : "" %>" placeholder="https://example.com/image.jpg" />
+        <textarea name="description" required><%= homestay != null ? nn(homestay.getDescription()) : "" %></textarea>
+        <label>Hình ảnh:</label>
+        <input type="file" name="imageFile" accept="image/*" />
         <% if (homestay != null && homestay.getImage() != null && !homestay.getImage().trim().isEmpty()) { %>
             <div style="margin-top: 5px; font-size: 12px; color: #666;">
-                Ảnh hiện tại: <a href="<%= homestay.getImage() %>" target="_blank">Xem ảnh</a>
+                Ảnh hiện tại: <a href="<%= nn(homestay.getImage()) %>" target="_blank">Xem ảnh</a>
             </div>
         <% } %>
         <label>Email:</label>
-        <input type="email" name="email" value="<%= homestay != null ? homestay.getEmail() : "" %>" placeholder="example@email.com" />
+        <input type="email" name="email" value="<%= homestay != null ? nn(homestay.getEmail()) : "" %>" placeholder="example@email.com" />
         <label>Số điện thoại:</label>
-        <input type="text" name="phone" value="<%= homestay != null ? homestay.getPhone() : "" %>" required/>
+        <input type="text" name="phone" value="<%= homestay != null ? nn(homestay.getPhone()) : "" %>" required/>
         <button type="submit">Lưu</button>
         <a href="../homestays">Hủy</a>
+        <a href="/homestay-management/manager/homestays" style="margin-left:10px;display:inline-block;padding:6px 12px;border:1px solid #ddd;border-radius:6px;text-decoration:none;color:#333;background:#f8f9fa">← Quay lại</a>
     </form>
 </body>
+<%@ include file="../partials/footer.jsp" %>
 </html>

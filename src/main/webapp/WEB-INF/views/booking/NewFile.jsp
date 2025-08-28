@@ -1,9 +1,12 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.List, com.homestay.model.Service" %>
+<%@ include file="../partials/header.jsp" %>
 <%
     Integer homestayId = (Integer) request.getAttribute("homestayId");
     Integer roomId = (Integer) request.getAttribute("roomId");
     String error = (String) request.getAttribute("error");
     String message = (String) request.getAttribute("message");
+    List<Service> homestayServices = (List<Service>) request.getAttribute("homestayServices");
 %>
 <!DOCTYPE html>
 <html>
@@ -11,7 +14,7 @@
     <meta charset="UTF-8">
     <title>Đặt phòng</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f6f8fb; margin: 0; padding: 20px; }
+        body { font-family: Arial, sans-serif; background: #f6f8fb; margin: 0; padding: 0; }
         .card { max-width: 600px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); overflow: hidden; }
         .header { background: linear-gradient(135deg,#667eea,#764ba2); color: #fff; padding: 24px; }
         .content { padding: 24px; }
@@ -27,6 +30,13 @@
         .alert-error { background: #fdecea; color: #b0302f; border: 1px solid #f5c6cb; }
         .alert-success { background: #e6f4ea; color: #1e7e34; border: 1px solid #c3e6cb; }
         .meta { color: #6c757d; margin: 0 0 8px 0; }
+        .services-section { margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; }
+        .services-title { font-size: 1.1em; font-weight: 600; color: #2c3e50; margin-bottom: 15px; }
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .service-item { display: flex; align-items: center; gap: 8px; padding: 8px; background: white; border-radius: 6px; border: 1px solid #dee2e6; }
+        .service-item input[type="checkbox"] { width: auto; margin: 0; }
+        .service-item label { margin: 0; font-weight: normal; color: #495057; cursor: pointer; }
+        .service-price { color: #27ae60; font-weight: 600; font-size: 0.9em; }
     </style>
     <script>
         function presetMinDates() {
@@ -72,6 +82,28 @@
                         <p class="meta">Hiện tại chỉ hỗ trợ đặt 1 phòng/lần.</p>
                     </div>
                 </div>
+                
+                <!-- Phần dịch vụ -->
+                <div class="services-section">
+                    <div class="services-title">🛎️ Dịch vụ bổ sung</div>
+                    <% if (homestayServices != null && !homestayServices.isEmpty()) { %>
+                        <div class="services-grid">
+                            <% for (Service service : homestayServices) { %>
+                                <div class="service-item">
+                                    <input type="checkbox" id="service_<%= service.getId() %>" name="selectedServices" value="<%= service.getId() %>" />
+                                    <label for="service_<%= service.getId() %>">
+                                        <%= service.getName() %>
+                                        <% if (service.getPrice() != null) { %>
+                                            <span class="service-price">(+₫<%= service.getPrice() %>)</span>
+                                        <% } %>
+                                    </label>
+                                </div>
+                            <% } %>
+                        </div>
+                    <% } else { %>
+                        <p class="meta">Homestay này chưa có dịch vụ bổ sung nào.</p>
+                    <% } %>
+                </div>
                 <div class="actions">
                     <a class="btn btn-secondary" href="/homestay-management/homestays/<%= homestayId %>/rooms">Hủy</a>
                     <button type="submit" class="btn btn-primary">Gửi yêu cầu</button>
@@ -80,4 +112,5 @@
         </div>
     </div>
 </body>
+<%@ include file="../partials/footer.jsp" %>
 </html>

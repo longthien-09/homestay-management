@@ -1,19 +1,16 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.homestay.model.Room" %>
 <%
     Room room = (Room) request.getAttribute("room");
     int homestayId = (request.getAttribute("homestayId") != null) ? (Integer) request.getAttribute("homestayId") : 0;
 %>
+<%@ include file="../partials/header.jsp" %>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Chi tiết phòng <%= room != null ? room.getRoomNumber() : "" %></title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            background: #f7f7f7; 
-            margin: 0; 
-            padding: 20px;
-        }
+        body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
         .container {
             max-width: 900px;
             margin: 0 auto;
@@ -256,5 +253,6 @@
             </div>
         </div>
     </div>
+<%@ include file="../partials/footer.jsp" %>
 </body>
 </html>

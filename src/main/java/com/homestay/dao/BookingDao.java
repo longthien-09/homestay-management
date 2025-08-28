@@ -78,6 +78,18 @@ public class BookingDao {
         return list;
     }
 
+    public Booking findById(int id) {
+        String sql = "SELECT * FROM bookings WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return null;
+    }
+
     public List<Map<String,Object>> adminList(Integer homestayId, String status) {
         List<Map<String,Object>> list = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
@@ -106,6 +118,51 @@ public class BookingDao {
                     row.put("homestay_name", rs.getString("homestay_name"));
                     row.put("homestay_id", rs.getInt("homestay_id"));
                     list.add(row);
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
+
+    // Lưu dịch vụ bổ sung đã chọn cho một booking
+    public void addServicesToBooking(int bookingId, List<Integer> serviceIds) {
+        if (serviceIds == null || serviceIds.isEmpty()) return;
+        String sql = "INSERT INTO booking_services (booking_id, service_id) VALUES (?, ?)";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            for (Integer sid : serviceIds) {
+                if (sid == null) continue;
+                ps.setInt(1, bookingId);
+                ps.setInt(2, sid);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Lấy các booking đang hoạt động của user (PENDING/CONFIRMED) kèm thông tin homestay
+    public List<Map<String,Object>> findActiveBookingsByUser(int userId) {
+        List<Map<String,Object>> list = new ArrayList<>();
+        String sql = "SELECT b.id AS booking_id, h.id AS homestay_id, h.name AS homestay_name, b.status, b.check_in, b.check_out " +
+                     "FROM bookings b " +
+                     "JOIN rooms r ON b.room_id=r.id " +
+                     "JOIN homestays h ON r.homestay_id=h.id " +
+                     "WHERE b.user_id=? AND b.status IN ('PENDING','CONFIRMED') ORDER BY b.created_at DESC";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String,Object> m = new HashMap<>();
+                    m.put("booking_id", rs.getInt("booking_id"));
+                    m.put("homestay_id", rs.getInt("homestay_id"));
+                    m.put("homestay_name", rs.getString("homestay_name"));
+                    m.put("status", rs.getString("status"));
+                    m.put("check_in", rs.getDate("check_in"));
+                    m.put("check_out", rs.getDate("check_out"));
+                    list.add(m);
                 }
             }
         } catch (Exception e) { e.printStackTrace(); }

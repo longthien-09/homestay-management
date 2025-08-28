@@ -1,65 +1,34 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List, com.homestay.model.Room" %>
+<%@ include file="../partials/header.jsp" %>
 <%
     List<Room> rooms = (List<Room>) request.getAttribute("rooms");
     int homestayId = (request.getAttribute("homestayId") != null) ? (Integer) request.getAttribute("homestayId") : 0;
 %>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Danh sách phòng - Homestay #<%= homestayId %></title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            background: #f7f7f7; 
-            margin: 0; 
-            padding: 20px;
+        body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
+        .container { max-width: 1200px; margin: 20px auto; }
+        .hero {
+            background: radial-gradient(1200px 400px at 10% -10%, rgba(102,126,234,.35), transparent),
+                        radial-gradient(1000px 500px at 110% -20%, rgba(116,75,160,.25), transparent),
+                        linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color:#fff; border-radius:18px; padding:32px 28px; box-shadow:0 8px 24px rgba(102,126,234,.25);
         }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 2.5em;
-            font-weight: 300;
-        }
-        .content {
-            padding: 30px;
-        }
-        .room-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-        .room-card {
-            background: #fff;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            border: 1px solid #eee;
-        }
+        .header { display:flex; align-items:center; justify-content:space-between; }
+        .header h1 { margin:0; font-size:2.2em; font-weight:700; letter-spacing:.3px; }
+        .header .subtitle { opacity:.92; margin-top:6px; }
+        .content { padding: 22px 4px; }
+        .room-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:22px; margin-top:18px; }
+        .room-card { background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,0.08); transition:.25s; border:1px solid #eef0f5; }
         .room-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
-        .room-image {
-            width: 100%;
-            height: 200px;
-            overflow: hidden;
-            background: #f8f9fa;
-        }
+        .room-image { width:100%; height:200px; overflow:hidden; background:#f8f9fa; }
         .room-image img {
             width: 100%;
             height: 100%;
@@ -69,27 +38,10 @@
         .room-card:hover .room-image img {
             transform: scale(1.05);
         }
-        .room-info {
-            padding: 20px;
-        }
-        .room-number {
-            color: #2c3e50;
-            font-size: 1.4em;
-            margin: 0 0 10px 0;
-            font-weight: 600;
-        }
-        .room-type {
-            color: #667eea;
-            font-size: 1.1em;
-            margin: 0 0 8px 0;
-            font-weight: 500;
-        }
-        .room-price {
-            color: #27ae60;
-            font-size: 1.3em;
-            margin: 0 0 10px 0;
-            font-weight: 600;
-        }
+        .room-info { padding: 18px; }
+        .room-number { color:#2c3e50; font-size:1.25em; margin:0 0 6px 0; font-weight:700; }
+        .room-type { color:#667eea; font-size:1em; margin:0 0 6px 0; font-weight:600; }
+        .room-price { color:#1aae6a; font-size:1.2em; margin: 2px 0 8px 0; font-weight:700; }
         .room-status {
             display: inline-block;
             padding: 4px 12px;
@@ -110,20 +62,11 @@
             background: #fff3cd;
             color: #856404;
         }
-        .room-description {
-            color: #7f8c8d;
-            font-size: 0.95em;
-            line-height: 1.5;
-            margin: 0;
-        }
-        .actions {
-            text-align: center;
-            padding: 20px;
-            border-top: 1px solid #eee;
-        }
+        .room-description { color:#6b7785; font-size:.95em; line-height:1.55; margin:0; min-height: 44px; }
+        .actions { text-align:center; padding:20px 8px; }
         .btn {
             display: inline-block;
-            padding: 12px 25px;
+            padding: 10px 22px;
             margin: 0 10px;
             border-radius: 25px;
             text-decoration: none;
@@ -156,9 +99,16 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🏠 Danh sách phòng</h1>
-            <p>Homestay #<%= homestayId %></p>
+        <div class="hero">
+            <div class="header">
+                <div>
+                    <h1>🏠 Danh sách phòng</h1>
+                    <div class="subtitle">Homestay #<%= homestayId %></div>
+                </div>
+                <div>
+                    <a href="/homestay-management/homestays/<%= homestayId %>" class="btn btn-secondary">← Quay lại</a>
+                </div>
+            </div>
         </div>
         
         <div class="content">
@@ -176,7 +126,7 @@
                             <div class="room-info">
                                 <h3 class="room-number"><%= room.getRoomNumber() %></h3>
                                 <p class="room-type"><%= room.getType() %></p>
-                                <p class="room-price">₫<%= room.getPrice() != null ? room.getPrice() : "0" %></p>
+                                <p class="room-price">₫<%= room.getPrice() != null ? room.getPrice() : "0" %> / đêm</p>
                                 <span class="room-status status-<%= room.getStatus() != null ? room.getStatus().toLowerCase() : "available" %>">
                                     <% if ("AVAILABLE".equals(room.getStatus())) { %>
                                         ✅ Còn trống
@@ -203,10 +153,10 @@
             <% } %>
             
             <div class="actions">
-                <a href="/homestay-management/homestays/<%= homestayId %>" class="btn btn-secondary">← Quay lại homestay</a>
                 <a href="/homestay-management/homestays" class="btn btn-primary">🏠 Xem tất cả homestay</a>
             </div>
         </div>
     </div>
+<%@ include file="../partials/footer.jsp" %>
 </body>
 </html>

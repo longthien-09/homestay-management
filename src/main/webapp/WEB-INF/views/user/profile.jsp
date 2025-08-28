@@ -1,6 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<%@ include file="../partials/header.jspf" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ include file="../partials/header.jsp" %>
 <%@ page import="com.homestay.model.User" %>
 <%
     User user = (User) request.getAttribute("user");
@@ -11,7 +10,7 @@
     <meta charset="UTF-8">
     <title>Thông tin cá nhân - Homestay Management</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
         .profile-container {
             max-width: 500px; margin: 40px auto; background: #fff; border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 30px;
@@ -57,11 +56,6 @@
     
     <div class="user-info">
         <p><strong>Vai trò:</strong> <%= user.getRole() != null ? user.getRole() : "N/A" %></p>
-        <% if (user.getHomestayId() != null && user.getHomestayId() > 0) { %>
-            <p><strong>Homestay ID:</strong> <%= user.getHomestayId() %></p>
-        <% } else { %>
-            <p><strong>Homestay ID:</strong> Chưa được gán</p>
-        <% } %>
         <p><strong>Trạng thái:</strong> <%= user.isActive() ? "Hoạt động" : "Đã khóa" %></p>
     </div>
     
@@ -85,6 +79,6 @@
         <button class="btn" type="submit">Cập nhật thông tin</button>
     </form>
 </div>
-<%@ include file="../partials/footer.jspf" %>
+<%@ include file="../partials/footer.jsp" %>
 </body>
 </html>

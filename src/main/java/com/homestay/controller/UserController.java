@@ -33,7 +33,6 @@ public class UserController {
         user.setUsername(currentUser.getUsername());
         user.setRole(currentUser.getRole());
         user.setActive(currentUser.isActive());
-        user.setHomestayId(currentUser.getHomestayId());
         userService.updateUser(user);
         session.setAttribute("currentUser", userService.getUserById(user.getId()));
         model.addAttribute("user", userService.getUserById(user.getId()));

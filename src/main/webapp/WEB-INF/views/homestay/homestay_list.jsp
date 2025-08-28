@@ -1,14 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List, com.homestay.model.Homestay" %>
+<%@ include file="../partials/header.jsp" %>
 <%
     List<Homestay> homestays = (List<Homestay>) request.getAttribute("homestays");
+    java.util.Map<Integer, java.util.List<com.homestay.model.Room>> roomsByHomestay = (java.util.Map<Integer, java.util.List<com.homestay.model.Room>>) request.getAttribute("roomsByHomestay");
 %>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Quản lý Homestay</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f7f7f7; }
+        body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
         h2 { color: #2c3e50; text-align: center; }
         table { border-collapse: collapse; width: 90%; margin: 20px auto; background: #fff; box-shadow: 0 2px 8px #ccc; border-radius: 8px; overflow: hidden; }
         th, td { padding: 12px 10px; text-align: center; }
@@ -23,42 +25,37 @@
     </style>
 </head>
 <body>
-    <h2>Danh sách Homestay</h2>
-    <a class="btn-add" href="/homestay-management/admin/homestays/add">Thêm Homestay mới</a>
-    <% if (request.getAttribute("error") != null) { %>
-        <div style="color: red; text-align: center; font-weight: bold; margin-bottom: 10px; background: #ffe6e6; padding: 10px; border-radius: 5px;">
-            <%= request.getAttribute("error") %>
-        </div>
+    <h2>Danh sách Homestay bạn quản lý</h2>
+    <a class="btn-add" href="/homestay-management/manager/homestays/add">Thêm Homestay mới</a>
+    <% if (homestays != null && !homestays.isEmpty()) { %>
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Tên</th>
+                <th>Địa chỉ</th>
+                <th>Số phone</th>
+                <th>Mô tả</th>
+                <th>Hình ảnh</th>
+                <th>Hành động</th>
+            </tr>
+            <% for (Homestay h : homestays) { %>
+            <tr>
+                <td><%= h.getId() %></td>
+                <td><%= h.getName() %></td>
+                <td><%= h.getAddress() %></td>
+                <td><%= h.getPhone() %></td>
+                <td><%= h.getDescription() %></td>
+                <td><img src="<%= h.getImage() %>" alt="Hình ảnh" /></td>
+                <td>
+                    <a href="/homestay-management/manager/homestays/edit/<%= h.getId() %>">Sửa</a> |
+                    <a href="/homestay-management/manager/homestays/delete/<%= h.getId() %>" onclick="return confirm('Bạn có chắc muốn xóa?');">Xóa</a>
+                </td>
+            </tr>
+            <% } %>
+        </table>
+    <% } else { %>
+        <div style="text-align:center; color:#888; font-size:18px;">Bạn chưa quản lý homestay nào!</div>
     <% } %>
-    <% if (request.getAttribute("success") != null) { %>
-        <div style="color: green; text-align: center; font-weight: bold; margin-bottom: 10px; background: #e6ffe6; padding: 10px; border-radius: 5px;">
-            <%= request.getAttribute("success") %>
-        </div>
-    <% } %>
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>Tên</th>
-            <th>Địa chỉ</th>
-            <th>Số phone</th>
-            <th>Mô tả</th>
-            <th>Hình ảnh</th>
-            <th>Hành động</th>
-        </tr>
-        <% if (homestays != null) for (Homestay h : homestays) { %>
-        <tr>
-            <td><%= h.getId() %></td>
-            <td><%= h.getName() %></td>
-            <td><%= h.getAddress() %></td>
-            <td><%= h.getPhone() %></td>
-            <td><%= h.getDescription() %></td>
-            <td><img src="<%= h.getImage() %>" alt="Hình ảnh" /></td>
-            <td>
-                <a href="/homestay-management/admin/homestays/edit/<%= h.getId() %>">Sửa</a> |
-                <a href="/homestay-management/admin/homestays/delete/<%= h.getId() %>" onclick="return confirm('Bạn có chắc muốn xóa?');">Xóa</a>
-            </td>
-        </tr>
-        <% } %>
-    </table>
 </body>
+<%@ include file="../partials/footer.jsp" %>
 </html>

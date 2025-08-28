@@ -1,10 +1,9 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List, com.homestay.model.Homestay" %>
 <%
     List<Homestay> featuredHomestays = (List<Homestay>) request.getAttribute("featuredHomestays");
 %>
-<%@ include file="partials/header.jspf" %>
+<%@ include file="partials/header.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -456,7 +455,7 @@
                 </div>
             </div>
             <div class="slide">
-                <img src="https://images.unsplash.com/photo-1521783988139-89397d761dce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2025&q=80" alt="Homestay 3">
+                <img src="https://images.unsplash.com/photo-1493770348161-369560ae357d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="Homestay 3">
                 <div class="slide-content">
                     <h2>Vị trí thuận tiện</h2>
                     <p>Gần trung tâm thành phố, dễ dàng di chuyển</p>
@@ -482,50 +481,14 @@
         </div>
     </div>
 
-    <!-- Search Section -->
+    <!-- Search Section (đơn giản) -->
     <div class="search-section">
         <div class="search-container">
-            <form class="search-form">
+            <form class="search-form" method="get" action="<%= request.getContextPath() %>/homestays">
                 <div class="location-search">
-                <span class="search-icon">🔍</span>
-                    <input type="text" class="location-input" placeholder="Hồ Chí Minh" value="Hồ Chí Minh">
+                    <span class="search-icon">🔎</span>
+                    <input type="text" class="location-input" name="q" placeholder="Tìm theo tên homestay, địa chỉ, loại phòng, giá...">
                 </div>
-                
-                <div class="search-details">
-                    <div class="search-field">
-                        <span class="field-icon">📅</span>
-                        <div>
-                            <div class="field-content" id="checkin-date">7 tháng 12 2025</div>
-                            <div class="field-label" id="checkin-day">Chủ nhật</div>
-                        </div>
-                        <input type="date" id="checkin-input" class="date-input" onchange="updateCheckinDate(this.value)">
-                    </div>
-                    
-                    <div class="search-field">
-                        <span class="field-icon">📅</span>
-                        <div>
-                            <div class="field-content" id="checkout-date">8 tháng 12 2025</div>
-                            <div class="field-label" id="checkout-day">Thứ Hai</div>
-                        </div>
-                        <input type="date" id="checkout-input" class="date-input" onchange="updateCheckoutDate(this.value)">
-                    </div>
-                    
-                    <div class="search-field" onclick="toggleRoomTypeDropdown()">
-                        <span class="field-icon">🏠</span>
-                        <div>
-                            <div class="field-content" id="room-type-text">Loại phòng</div>
-                            <span style="color: #aaa; margin-left: 10px;">▼</span>
-                        </div>
-                        <div id="room-type-dropdown" class="room-type-dropdown" style="display: none;">
-                            <div class="dropdown-item" onclick="selectRoomType('Tất cả')">Tất cả</div>
-                            <div class="dropdown-item" onclick="selectRoomType('Phòng đơn')">Phòng đơn</div>
-                            <div class="dropdown-item" onclick="selectRoomType('Phòng đôi')">Phòng đôi</div>
-                            <div class="dropdown-item" onclick="selectRoomType('Phòng gia đình')">Phòng gia đình</div>
-                            <div class="dropdown-item" onclick="selectRoomType('Phòng VIP')">Phòng VIP</div>
-                        </div>
-                    </div>
-                </div>
-                
                 <button type="submit" class="search-btn">TÌM</button>
             </form>
         </div>
@@ -543,11 +506,7 @@
                 <div class="homestay-card">
                     <a href="/homestay-management/homestays/<%= homestay.getId() %>">
                         <div class="homestay-image">
-                            <% if (homestay.getImage() != null && !homestay.getImage().trim().isEmpty()) { %>
-                                <img src="<%= homestay.getImage() %>" alt="<%= homestay.getName() %>">
-                            <% } else { %>
-                                <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="<%= homestay.getName() %>">
-                            <% } %>
+                            <img src="<%= homestay.getImage() %>" alt="<%= homestay.getName() %>">
                         </div>
                     </a>
                     <div class="homestay-info">
@@ -571,7 +530,7 @@
             <% } %>
         </div>
         <div class="view-all-container">
-            <a href="homestay-list.jsp" class="view-all-btn">Xem tất cả Homestay</a>
+            <a href="<%= request.getContextPath() %>/homestays" class="view-all-btn">Xem tất cả Homestay</a>
         </div>
         </div>
     </div>
@@ -582,10 +541,12 @@ const slides = document.querySelectorAll('.slide');
 const dots = document.querySelectorAll('.dot');
 
 function showSlide(index) {
+
     if (index >= slides.length) currentSlideIndex = 0;
-    if (index < 0) currentSlideIndex = slides.length - 1;
-    
-    document.getElementById('slider').style.transform = `translateX(-${currentSlideIndex * 25}%)`;
+    else if (index < 0) currentSlideIndex = slides.length - 1;
+    else currentSlideIndex = index;
+
+    document.getElementById('slider').style.transform = "translateX(-" + currentSlideIndex * 25 + "%)";
     
     // Update dots
     dots.forEach((dot, i) => {
@@ -618,7 +579,7 @@ function openDatePicker(type) {
 }
 
 // Add click event listeners to date fields
-document.addEventListener('DOMContentLoaded', function() {
+/* document.addEventListener('DOMContentLoaded', function() {
     const checkinField = document.querySelector('.search-field:first-child');
     const checkoutField = document.querySelector('.search-field:nth-child(2)');
     
@@ -656,7 +617,7 @@ document.addEventListener('DOMContentLoaded', function() {
             checkinInput.click();
         }
     };
-});
+}); */
         
 function updateCheckinDate(dateString) {
     const date = new Date(dateString);
@@ -698,16 +659,16 @@ function selectRoomType(type) {
 }
 
 // Close dropdown when clicking outside
-document.addEventListener('click', function(event) {
+/* document.addEventListener('click', function(event) {
     const dropdown = document.getElementById('room-type-dropdown');
     const roomTypeField = document.querySelector('.search-field:last-child');
     
     if (!roomTypeField.contains(event.target)) {
         dropdown.style.display = 'none';
     }
-        });
+        }); */
     </script>
 
-<%@ include file="partials/footer.jspf" %>
+<%@ include file="partials/footer.jsp" %>
 </body>
 </html>

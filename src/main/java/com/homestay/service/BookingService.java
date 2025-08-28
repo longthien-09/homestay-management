@@ -34,4 +34,17 @@ public class BookingService {
     public List<Booking> userHistory(int userId) { return bookingDao.findByUser(userId); }
 
     public List<Map<String,Object>> adminList(Integer homestayId, String status) { return bookingDao.adminList(homestayId, status); }
+
+    public com.homestay.model.Booking getBookingById(int id) {
+        return bookingDao.findById(id);
+    }
+
+    // Lưu dịch vụ đã chọn cho booking
+    public void saveSelectedServices(int bookingId, java.util.List<Integer> serviceIds) {
+        bookingDao.addServicesToBooking(bookingId, serviceIds);
+    }
+
+    public java.util.List<java.util.Map<String,Object>> getActiveBookingsByUser(int userId) {
+        return bookingDao.findActiveBookingsByUser(userId);
+    }
 }
