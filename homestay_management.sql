@@ -245,7 +245,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'thien','123','thienthien','thien@gmail.com','9355784124','USER',1),(2,'thien1','123','thienthien','thien@gmail.com','9355784124','MANAGER',1),(6,'thien11','1','áº»dfgh','thien@gmail.com','9355784124','MANAGER',1),(7,'thien14','1','áº»dfgh','thien@gmail.com','9355784124','MANAGER',1),(8,'thien15','1','áº»dfgh','thien@gmail.com','9355784124','MANAGER',1),(9,'thien16','1','áº»dfgh','thien@gmail.com','9355784124','MANAGER',1),(10,'thien17','1','áº»dfgh','thien@gmail.com','9355784124','MANAGER',1),(11,'thien18','1','áº»dfgh','thien@gmail.com','9355784124','MANAGER',1),(12,'Æ°','Æ°','f','12@gmail.com','12456789','MANAGER',1),(13,'v','v','v','12@gmail.com','12456789','MANAGER',1),(14,',',',',',','12@gmail.com','12456789','MANAGER',1),(15,'/','/','/','/@gmail.com','1234567890','MANAGER',1),(16,'\'','\'','\'','\'@gmail.com','123489','MANAGER',1),(17,'thien tháº§n','1234','thienthie','thien1@gmail.com','9355784124','USER',1),(18,'thien tháº§nn','1234','thienthie huá»³nh','thien1@gmail.com','9355784124','USER',1);
+
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
