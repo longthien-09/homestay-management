@@ -1,6 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List, com.homestay.model.Room" %>
 <%@ include file="../partials/header.jsp" %>
+<%! private String formatPrice(java.math.BigDecimal price) { 
+    if (price == null) return "0₫";
+    return String.format("%,.0f₫", price.doubleValue()).replace(",", ".");
+} %>
 <%
     List<Room> rooms = (List<Room>) request.getAttribute("rooms");
     int homestayId = (request.getAttribute("homestayId") != null) ? (Integer) request.getAttribute("homestayId") : 0;
@@ -126,7 +130,7 @@
                             <div class="room-info">
                                 <h3 class="room-number"><%= room.getRoomNumber() %></h3>
                                 <p class="room-type"><%= room.getType() %></p>
-                                <p class="room-price">₫<%= room.getPrice() != null ? room.getPrice() : "0" %> / đêm</p>
+                                <p class="room-price"><%= formatPrice(room.getPrice()) %> / đêm</p>
                                 <span class="room-status status-<%= room.getStatus() != null ? room.getStatus().toLowerCase() : "available" %>">
                                     <% if ("AVAILABLE".equals(room.getStatus())) { %>
                                         ✅ Còn trống

@@ -1,6 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.*, com.homestay.model.Service" %>
+<%@ page import="java.util.List, java.util.Map, com.homestay.model.Room" %>
 <%@ include file="../partials/header.jsp" %>
+<%! private String formatPrice(java.math.BigDecimal price) { 
+    if (price == null) return "0₫";
+    return String.format("%,.0f₫", price.doubleValue()).replace(",", ".");
+} %>
 <%
     Map<String,Object> payment = (Map<String,Object>) request.getAttribute("payment");
     com.homestay.model.Booking booking = (com.homestay.model.Booking) request.getAttribute("booking");
@@ -138,7 +142,7 @@
                             <div class="service-item">
                                 <div class="service-name"><%= service.getName() %></div>
                                 <% if (service.getPrice() != null) { %>
-                                    <div class="service-price">+₫<%= service.getPrice() %></div>
+                                    <div class="service-price">+<%= formatPrice(service.getPrice()) %></div>
                                 <% } %>
                             </div>
                         <% } %>
@@ -153,18 +157,18 @@
                 <% if (!serviceOnly) { %>
                     <div class="price-row">
                         <span>Giá phòng:</span>
-                        <span>₫<%= room != null && room.getPrice() != null ? room.getPrice() : "0" %></span>
+                        <span><%= formatPrice(room != null ? room.getPrice() : null) %></span>
                     </div>
                 <% } %>
                 <% if (totalServiceAmount != null && totalServiceAmount.compareTo(java.math.BigDecimal.ZERO) > 0) { %>
                     <div class="price-row">
                         <span>Dịch vụ bổ sung:</span>
-                        <span>₫<%= totalServiceAmount %></span>
+                        <span><%= formatPrice(totalServiceAmount) %></span>
                     </div>
                 <% } %>
                 <div class="price-row total">
                     <span>Tổng tiền:</span>
-                    <span>₫<%= totalAmount != null ? totalAmount : payment.get("amount") %></span>
+                    <span><%= formatPrice(totalAmount != null ? totalAmount : payment.get("amount")) %></span>
                 </div>
             </div>
             
