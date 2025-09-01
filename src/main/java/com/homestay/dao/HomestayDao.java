@@ -335,4 +335,77 @@ public class HomestayDao {
         if ("null".equalsIgnoreCase(t)) return null;
         return s;
     }
+    
+    // Lấy danh sách tên services của homestay
+    public List<String> getServiceNamesByHomestayId(int homestayId) {
+        List<String> serviceNames = new ArrayList<>();
+        String sql = "SELECT name FROM services WHERE homestay_id = ? ORDER BY name";
+        
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, homestayId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    serviceNames.add(rs.getString("name"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return serviceNames;
+    }
+    
+    // Lấy homestay với services
+    public Homestay getHomestayWithServices(int id) {
+        Homestay homestay = getHomestayById(id);
+        if (homestay != null) {
+            List<String> services = getServiceNamesByHomestayId(id);
+            // Lưu services vào description tạm thời để hiển thị
+            if (!services.isEmpty()) {
+                homestay.setDescription(homestay.getDescription() + " | Dịch vụ: " + String.join(", ", services));
+            }
+        }
+        return homestay;
+    }
+    
+    // Lấy giá phòng thấp nhất của homestay
+    public java.math.BigDecimal getMinRoomPriceByHomestayId(int homestayId) {
+        String sql = "SELECT MIN(price) FROM rooms WHERE homestay_id = ? AND status = 'AVAILABLE'";
+        
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, homestayId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return java.math.BigDecimal.ZERO;
+    }
+    
+    // Lấy thông tin giá phòng của homestay
+    public java.util.Map<String, Object> getRoomPriceInfoByHomestayId(int homestayId) {
+        String sql = "SELECT MIN(price) as min_price, MAX(price) as max_price, COUNT(*) as room_count " +
+                    "FROM rooms WHERE homestay_id = ? AND status = 'AVAILABLE'";
+        
+        java.util.Map<String, Object> priceInfo = new java.util.HashMap<>();
+        
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, homestayId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    priceInfo.put("minPrice", rs.getBigDecimal("min_price"));
+                    priceInfo.put("maxPrice", rs.getBigDecimal("max_price"));
+                    priceInfo.put("roomCount", rs.getInt("room_count"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return priceInfo;
+    }
 }

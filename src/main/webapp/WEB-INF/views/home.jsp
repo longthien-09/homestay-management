@@ -3,346 +3,305 @@
 <%
     List<Homestay> featuredHomestays = (List<Homestay>) request.getAttribute("featuredHomestays");
 %>
-<%@ include file="partials/header.jsp" %>
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Homestay Management - Trang chủ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HomestayPro - Khám phá homestay tuyệt vời</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; }
-        
-        /* Slide bar styles */
-        .slider-container {
-            position: relative;
-            width: 100%;
-            height: 400px;
-            overflow: hidden;
-            margin-bottom: 40px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
-        .slider {
-            display: flex;
-            width: 400%;
-            height: 100%;
-            transition: transform 0.5s ease-in-out;
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
         }
-        
-        .slide {
-            width: 25%;
-            height: 100%;
-            position: relative;
-        }
-        
-        .slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .slide-content {
-            position: absolute;
-            bottom: 0;
+
+        /* Header */
+        .header {
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.7));
-            color: white;
-            padding: 30px;
-            text-align: center;
+            z-index: 1000;
         }
-        
-        .slide-content h2 {
-            margin: 0 0 10px 0;
-            font-size: 2em;
-            font-weight: 300;
-        }
-        
-        .slide-content p {
-            margin: 0;
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-        
-        .slider-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255,255,255,0.8);
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .slider-nav:hover {
-            background: rgba(255,255,255,1);
-            transform: translateY(-50%) scale(1.1);
-        }
-        
-        .prev { left: 20px; }
-        .next { right: 20px; }
-        
-        .dots {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-        }
-        
-        .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.5);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .dot.active {
-            background: white;
-            transform: scale(1.2);
-        }
-        
 
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e31e24;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            color: #e31e24;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-login {
+            padding: 10px 20px;
+            border: 1px solid #e31e24;
+            background: transparent;
+            color: #e31e24;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
         
-        /* Search bar styles */
-        .search-section {
-            background: #1a1a1a;
-            padding: 40px 20px;
-            margin-bottom: 40px;
+        .btn-login:hover {
+            background: #e31e24;
+            color: white;
+        }
+
+        .btn-register {
+            padding: 10px 20px;
+            background: #e31e24;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-register:hover {
+            background: #c41e24;
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 20px;
             text-align: center;
         }
         
-        .search-container {
+        .hero-content {
             max-width: 800px;
             margin: 0 auto;
         }
         
+        .hero h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .hero p {
+            font-size: 1.3em;
+            margin-bottom: 50px;
+            opacity: 0.9;
+        }
+
+        /* Search Form */
+        .search-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
         .search-form {
-            background: #2a2a2a;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        
-        .location-search {
-            position: relative;
-            margin-bottom: 25px;
-        }
-        
-        .location-input {
-            width: 100%;
-            padding: 18px 20px 18px 50px;
-            background: #333;
-            border: 1px solid #444;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            outline: none;
-        }
-        
-        .location-input::placeholder {
-            color: #aaa;
-        }
-        
-        .search-icon {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #aaa;
-            font-size: 18px;
-        }
-        
-        .search-details {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
             gap: 20px;
-            margin-bottom: 25px;
+            align-items: end;
         }
         
         .search-field {
-            position: relative;
-            background: #333;
-            border: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .search-field label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .search-input {
+            padding: 15px;
+            border: 2px solid #e1e5e9;
             border-radius: 10px;
-            padding: 18px 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .search-field:hover {
-            border-color: #667eea;
-        }
-        
-        .field-icon {
-            color: #aaa;
-            margin-right: 10px;
             font-size: 16px;
+            transition: border-color 0.3s ease;
         }
-        
-        .field-content {
-            color: white;
-            font-size: 14px;
+
+        .search-input:focus {
+            outline: none;
+            border-color: #e31e24;
         }
-        
-        .field-label {
-            color: #aaa;
-            font-size: 12px;
-            margin-top: 5px;
-        }
-        
-        .add-flight {
-            text-align: left;
-            margin-bottom: 25px;
-        }
-        
-        .add-flight a {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: color 0.3s ease;
-        }
-        
-        .add-flight a:hover {
-            color: #5a6fd8;
+
+        .search-input::placeholder {
+            color: #999;
         }
         
         .search-btn {
-            width: 100%;
-            background: #667eea;
+            background: #e31e24;
             color: white;
             border: none;
-            padding: 20px;
+            padding: 17px 30px;
             border-radius: 10px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
         }
         
         .search-btn:hover {
-            background: #5a6fd8;
+            background: #c41e24;
             transform: translateY(-2px);
         }
         
-        /* Dropdown styles */
-        .room-type-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: #333;
-            border: 1px solid #444;
-            border-radius: 10px;
-            margin-top: 5px;
-            z-index: 1000;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        
-        .dropdown-item {
-            padding: 15px 20px;
-            color: white;
-            cursor: pointer;
-            border-bottom: 1px solid #444;
-            transition: background 0.3s ease;
-        }
-        
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-        
-        .dropdown-item:hover {
-            background: #444;
-        }
-        
-        .search-field {
-            position: relative;
-        }
-        
-        .date-input {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-            z-index: 10;
-            font-size: 16px; /* Prevent zoom on mobile */
-        }
-        
-        .search-field {
-            cursor: pointer;
-        }
-        
-        .search-field:hover {
-            border-color: #667eea;
-            background: #3a3a3a;
-        }
-        
-        /* Homestay list styles */
-        .homestay-section {
-            padding: 60px 20px;
+        /* Features Section */
+        .features {
+            padding: 80px 20px;
             background: #f8f9fa;
         }
         
-        .homestay-container {
+        .features-container {
             max-width: 1200px;
             margin: 0 auto;
         }
         
         .section-title {
             text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: 60px;
         }
         
         .section-title h2 {
-            color: #2c3e50;
             font-size: 2.5em;
+            color: #333;
             margin-bottom: 15px;
             font-weight: 300;
         }
         
         .section-title p {
-            color: #7f8c8d;
             font-size: 1.2em;
-            margin: 0;
+            color: #666;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            color: white;
+            font-size: 30px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Homestay Section */
+        .homestay-section {
+            padding: 80px 20px;
+            background: white;
+        }
+
+        .homestay-container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
         .homestay-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 30px;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
         }
         
         .homestay-card {
             background: white;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
             cursor: pointer;
         }
         
         .homestay-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
         
         .homestay-image {
             width: 100%;
-            height: 200px;
+            height: 250px;
             overflow: hidden;
+            position: relative;
         }
         
         .homestay-image img {
@@ -353,7 +312,19 @@
         }
         
         .homestay-card:hover .homestay-image img {
-            transform: scale(1.05);
+            transform: scale(1.1);
+        }
+
+        .homestay-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #e31e24;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
         }
         
         .homestay-info {
@@ -361,53 +332,92 @@
         }
         
         .homestay-name {
-            color: #2c3e50;
             font-size: 1.4em;
-            margin: 0 0 10px 0;
+            margin-bottom: 10px;
+            color: #333;
             font-weight: 600;
         }
         
-        .homestay-address {
-            color: #7f8c8d;
-            font-size: 1em;
-            margin: 0 0 15px 0;
+        .homestay-location {
+            color: #666;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
         
-        .homestay-address::before {
-            content: "📍";
-            font-size: 1.2em;
+        .homestay-features {
+            margin-bottom: 15px;
         }
         
-        .view-more-btn {
+        .feature-tag {
             display: inline-block;
-            background: #667eea;
+            background: #f8f9fa;
+            color: #495057;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-right: 8px;
+            margin-bottom: 5px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .homestay-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .stars {
+            color: #ffc107;
+        }
+
+        .rating-text {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .homestay-price {
+            font-size: 1.3em;
+            color: #e31e24;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .price-unit {
+            font-size: 14px;
+            color: #666;
+            font-weight: normal;
+        }
+
+        .view-details-btn {
+            display: inline-block;
+            background: #e31e24;
             color: white;
             padding: 12px 25px;
             border-radius: 25px;
             text-decoration: none;
             font-weight: 500;
             transition: all 0.3s ease;
-            margin-top: 10px;
+            width: 100%;
+            text-align: center;
         }
         
-        .view-more-btn:hover {
-            background: #5a6fd8;
+        .view-details-btn:hover {
+            background: #c41e24;
             transform: translateY(-2px);
         }
         
         .view-all-container {
             text-align: center;
-            margin-top: 40px;
         }
         
         .view-all-btn {
             display: inline-block;
             background: transparent;
-            color: #667eea;
-            border: 2px solid #667eea;
+            color: #e31e24;
+            border: 2px solid #e31e24;
             padding: 15px 40px;
             border-radius: 30px;
             text-decoration: none;
@@ -417,258 +427,489 @@
         }
         
         .view-all-btn:hover {
-            background: #667eea;
+            background: #e31e24;
             color: white;
             transform: translateY(-2px);
         }
         
-        .container {
-            max-width: 900px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 40px 30px 30px 30px;
+        /* Footer */
+        .footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 60px 20px 30px;
         }
-        h1 { text-align: center; color: #007bff; margin-bottom: 20px; }
-        .intro { text-align: center; font-size: 20px; color: #333; margin-bottom: 30px; }
-        .features { display: flex; flex-wrap: wrap; justify-content: space-around; }
-        .feature {
-            width: 260px; background: #f8f9fa; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-            margin: 15px; padding: 22px 18px; text-align: center;
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
         }
-        .feature h3 { color: #007bff; margin-bottom: 10px; }
-        .feature p { color: #555; }
+
+        .footer-section h3 {
+            margin-bottom: 20px;
+            color: #e31e24;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul li a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: #e31e24;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            color: #999;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2.5em;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .homestay-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
     </style>
 </head>
 <body>
-    <!-- Slide bar -->
-    <div class="slider-container">
-        <div class="slider" id="slider">
-            <div class="slide">
-                <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Homestay 1">
-                <div class="slide-content">
-                    <h2>Chào mừng đến với Homestay</h2>
-                    <p>Trải nghiệm nghỉ dưỡng tuyệt vời với không gian ấm cúng</p>
-                </div>
-            </div>
-            <div class="slide">
-                <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2068&q=80" alt="Homestay 2">
-                <div class="slide-content">
-                    <h2>Không gian thoải mái</h2>
-                    <p>Thiết kế hiện đại với đầy đủ tiện nghi</p>
-                </div>
-            </div>
-            <div class="slide">
-                <img src="https://images.unsplash.com/photo-1493770348161-369560ae357d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="Homestay 3">
-                <div class="slide-content">
-                    <h2>Vị trí thuận tiện</h2>
-                    <p>Gần trung tâm thành phố, dễ dàng di chuyển</p>
-                </div>
-            </div>
-            <div class="slide">
-                <img src="https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Homestay 4">
-                <div class="slide-content">
-                    <h2>Dịch vụ chất lượng</h2>
-                    <p>Cam kết mang đến trải nghiệm tốt nhất cho khách hàng</p>
-                </div>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="<%= request.getContextPath() %>/" class="logo">
+                <i class="fas fa-home"></i> HomestayPro
+            </a>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="<%= request.getContextPath() %>/homestays">Khám phá</a></li>
+                    <li><a href="#about">Về chúng tôi</a></li>
+                    <li><a href="#contact">Liên hệ</a></li>
+                    <li><a href="#help">Trợ giúp</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <a href="<%= request.getContextPath() %>/login" class="btn-login">Đăng nhập</a>
+                <a href="<%= request.getContextPath() %>/register" class="btn-register">Đăng ký</a>
             </div>
         </div>
-        
-        <button class="slider-nav prev" onclick="changeSlide(-1)">❮</button>
-        <button class="slider-nav next" onclick="changeSlide(1)">❯</button>
-        
-        <div class="dots">
-            <span class="dot active" onclick="currentSlide(1)"></span>
-            <span class="dot" onclick="currentSlide(2)"></span>
-            <span class="dot" onclick="currentSlide(3)"></span>
-            <span class="dot" onclick="currentSlide(4)"></span>
-        </div>
-    </div>
+    </header>
 
-    <!-- Search Section (đơn giản) -->
-    <div class="search-section">
-        <div class="search-container">
-            <form class="search-form" method="get" action="<%= request.getContextPath() %>/homestays">
-                <div class="location-search">
-                    <span class="search-icon">🔎</span>
-                    <input type="text" class="location-input" name="q" placeholder="Tìm theo tên homestay, địa chỉ, loại phòng, giá...">
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Khám phá homestay tuyệt vời</h1>
+            <p>Trải nghiệm nghỉ dưỡng độc đáo với không gian ấm cúng và dịch vụ chất lượng</p>
+            
+            <!-- Search Form -->
+            <div class="search-container">
+                <form class="search-form" method="get" action="<%= request.getContextPath() %>/search">
+                    <div class="search-field">
+                        <label for="location">Địa điểm</label>
+                        <input type="text" id="location" name="location" class="search-input" placeholder="Bạn muốn đi đâu?">
+                    </div>
+                    <div class="search-field">
+                        <label for="checkin">Check-in</label>
+                        <input type="date" id="checkin" name="checkin" class="search-input">
+                    </div>
+                    <div class="search-field">
+                        <label for="checkout">Check-out</label>
+                        <input type="date" id="checkout" name="checkout" class="search-input">
+                    </div>
+                    <div class="search-field">
+                        <label for="guests">Khách</label>
+                        <select id="guests" name="guests" class="search-input">
+                            <option value="1">1 khách</option>
+                            <option value="2">2 khách</option>
+                            <option value="3">3 khách</option>
+                            <option value="4">4 khách</option>
+                            <option value="5">5+ khách</option>
+                        </select>
+                    </div>
+                    <div class="search-field">
+                        <button type="submit" class="search-btn">
+                            <i class="fas fa-search"></i> Tìm kiếm
+                        </button>
+                    </div>
+                </form>
+            </div>
                 </div>
-                <button type="submit" class="search-btn">TÌM</button>
-            </form>
-        </div>
-    </div>
+    </section>
 
-<div class="homestay-section">
+    <!-- Features Section -->
+    <section class="features">
+        <div class="features-container">
+            <div class="section-title">
+                <h2>Tại sao chọn chúng tôi?</h2>
+                <p>Những lý do khiến chúng tôi trở thành lựa chọn hàng đầu</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card fade-in-up">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>An toàn & Bảo mật</h3>
+                    <p>Đảm bảo thông tin cá nhân và thanh toán của bạn được bảo vệ tuyệt đối</p>
+                </div>
+                <div class="feature-card fade-in-up">
+                    <div class="feature-icon">
+                        <i class="fas fa-star"></i>
+            </div>
+                    <h3>Chất lượng cao</h3>
+                    <p>Chỉ cung cấp những homestay đã được kiểm định chất lượng nghiêm ngặt</p>
+                </div>
+                <div class="feature-card fade-in-up">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+            </div>
+                    <h3>Hỗ trợ 24/7</h3>
+                    <p>Đội ngũ hỗ trợ khách hàng luôn sẵn sàng giúp đỡ bạn mọi lúc</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Homestay Section -->
+    <section class="homestay-section">
     <div class="homestay-container">
         <div class="section-title">
-            <h2>Các Homestay Nổi Bật</h2>
-            <p>Khám phá các homestay đẹp và ấm cúng tại các địa điểm hấp dẫn</p>
+                <h2>Homestay Nổi Bật</h2>
+                <p>Khám phá những homestay đẹp và ấm cúng tại các địa điểm hấp dẫn</p>
         </div>
+            
         <div class="homestay-grid">
             <% if (featuredHomestays != null && !featuredHomestays.isEmpty()) { %>
                 <% for (Homestay homestay : featuredHomestays) { %>
-                <div class="homestay-card">
-                    <a href="/homestay-management/homestays/<%= homestay.getId() %>">
+                    <div class="homestay-card fade-in-up">
                         <div class="homestay-image">
-                            <img src="<%= homestay.getImage() %>" alt="<%= homestay.getName() %>">
+                            <img src="<%= homestay.getImage() != null ? homestay.getImage() : "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" %>" 
+                                 alt="<%= homestay.getName() %>">
+                            <div class="homestay-badge">Nổi bật</div>
                         </div>
-                    </a>
                     <div class="homestay-info">
                         <h3 class="homestay-name"><%= homestay.getName() %></h3>
-                        <p class="homestay-address">Địa chỉ: <%= homestay.getAddress() != null ? homestay.getAddress() : "Chưa cập nhật" %></p>
-                        <a href="/homestay-management/homestays/<%= homestay.getId() %>" class="view-more-btn">Xem chi tiết</a>
-                    </div>
+                            <p class="homestay-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <%= homestay.getAddress() != null ? homestay.getAddress() : "Chưa cập nhật" %>
+                            </p>
+                            <div class="homestay-features">
+                                <% if (homestay.getDescription() != null && homestay.getDescription().contains("Dịch vụ:")) { %>
+                                    <% 
+                                        String desc = homestay.getDescription();
+                                        int serviceIndex = desc.indexOf("Dịch vụ:");
+                                        if (serviceIndex != -1) {
+                                            String services = desc.substring(serviceIndex + 8).trim();
+                                            String[] serviceArray = services.split(", ");
+                                            for (String service : serviceArray) {
+                                                if (!service.trim().isEmpty()) {
+                                    %>
+                                        <span class="feature-tag"><%= service.trim() %></span>
+                                    <% 
+                                                }
+                                            }
+                                        }
+                                    %>
+                                <% } else { %>
+                                    <span class="feature-tag">Chưa cập nhật</span>
+                                <% } %>
+                            </div>
+                            <div class="homestay-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="rating-text">Chưa có đánh giá</span>
+                            </div>
+                            <div class="homestay-price">
+                                <% if (homestay.getDescription() != null && homestay.getDescription().contains("Giá:")) { %>
+                                    <% 
+                                        String desc = homestay.getDescription();
+                                        int priceIndex = desc.indexOf("Giá:");
+                                        if (priceIndex != -1) {
+                                            String priceRange = desc.substring(priceIndex + 4).trim();
+                                            String[] prices = priceRange.split(" - ");
+                                            if (prices.length >= 2) {
+                                                try {
+                                                    java.math.BigDecimal minPrice = new java.math.BigDecimal(prices[0]);
+                                                    String formattedPrice = String.format("%,.0f", minPrice);
+                            %>
+                                    Từ <%= formattedPrice %>đ <span class="price-unit">/đêm</span>
+                            <% 
+                                                } catch (NumberFormatException e) {
+                            %>
+                                    Từ <%= priceRange %> <span class="price-unit">/đêm</span>
+                            <% 
+                                                }
+                                            }
+                                        }
+                                    %>
+                                <% } else { %>
+                                    Liên hệ <span class="price-unit">/đêm</span>
+                                <% } %>
+                            </div>
+                            <a href="<%= request.getContextPath() %>/homestays/<%= homestay.getId() %>" class="view-details-btn">
+                                Xem chi tiết
+                            </a>
+                        </div>
                 </div>
                 <% } %>
             <% } else { %>
                 <!-- Fallback khi không có homestay nào -->
-                <div class="homestay-card">
+                    <div class="homestay-card fade-in-up">
+                        <div class="homestay-image">
+                            <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="Homestay mẫu">
+                            <div class="homestay-badge">Mới</div>
+                        </div>
+                        <div class="homestay-info">
+                            <h3 class="homestay-name">Homestay Mẫu</h3>
+                            <p class="homestay-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Hà Nội, Việt Nam
+                            </p>
+                            <div class="homestay-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="rating-text">Chưa có đánh giá</span>
+                            </div>
+                            <div class="homestay-price">
+                                Liên hệ <span class="price-unit">/đêm</span>
+                            </div>
+                            <a href="#" class="view-details-btn">Xem chi tiết</a>
+                        </div>
+                    </div>
+                    
+                    <div class="homestay-card fade-in-up">
+                        <div class="homestay-image">
+                            <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2068&q=80" alt="Homestay mẫu 2">
+                            <div class="homestay-badge">Phổ biến</div>
+                        </div>
+                        <div class="homestay-info">
+                            <h3 class="homestay-name">Homestay Phố Cổ</h3>
+                            <p class="homestay-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Hà Nội, Việt Nam
+                            </p>
+                            <div class="homestay-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="rating-text">Chưa có đánh giá</span>
+                            </div>
+                            <div class="homestay-price">
+                                Liên hệ <span class="price-unit">/đêm</span>
+                            </div>
+                            <a href="#" class="view-details-btn">Xem chi tiết</a>
+                        </div>
+                    </div>
+                    
+                    <div class="homestay-card fade-in-up">
                     <div class="homestay-image">
-                        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Homestay mẫu">
+                            <img src="https://images.unsplash.com/photo-1493770348161-369560ae357d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="Homestay mẫu 3">
+                            <div class="homestay-badge">Giảm giá</div>
             </div>
                     <div class="homestay-info">
-                        <h3 class="homestay-name">Chưa có homestay</h3>
-                        <p class="homestay-address">Hãy thêm homestay đầu tiên!</p>
+                            <h3 class="homestay-name">Homestay Sapa</h3>
+                            <p class="homestay-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Sapa, Lào Cai
+                            </p>
+                            <div class="homestay-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="rating-text">4.8 (156 đánh giá)</span>
+                            </div>
+                            <div class="homestay-price">
+                                Từ 400.000đ <span class="price-unit">/đêm</span>
+                            </div>
+                            <a href="#" class="view-details-btn">Xem chi tiết</a>
             </div>
             </div>
             <% } %>
         </div>
+            
         <div class="view-all-container">
-            <a href="<%= request.getContextPath() %>/homestays" class="view-all-btn">Xem tất cả Homestay</a>
+                <a href="<%= request.getContextPath() %>/homestays" class="view-all-btn">
+                    Xem tất cả Homestay
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>Về HomestayPro</h3>
+                <ul>
+                    <li><a href="#">Giới thiệu</a></li>
+                    <li><a href="#">Tuyển dụng</a></li>
+                    <li><a href="#">Báo chí</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Hỗ trợ</h3>
+                <ul>
+                    <li><a href="#">Trung tâm trợ giúp</a></li>
+                    <li><a href="#">Liên hệ</a></li>
+                    <li><a href="#">Phản hồi</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Pháp lý</h3>
+                <ul>
+                    <li><a href="#">Điều khoản sử dụng</a></li>
+                    <li><a href="#">Chính sách bảo mật</a></li>
+                    <li><a href="#">Chính sách cookie</a></li>
+                    <li><a href="#">Quyền riêng tư</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Kết nối</h3>
+                <ul>
+                    <li><a href="#"><i class="fab fa-facebook"></i> Facebook</a></li>
+                    <li><a href="#"><i class="fab fa-twitter"></i> Twitter</a></li>
+                    <li><a href="#"><i class="fab fa-instagram"></i> Instagram</a></li>
+                    <li><a href="#"><i class="fab fa-youtube"></i> YouTube</a></li>
+                </ul>
         </div>
         </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 HomestayPro. Tất cả quyền được bảo lưu.</p>
     </div>
+    </footer>
     
     <script>
-let currentSlideIndex = 0;
-const slides = document.querySelectorAll('.slide');
-const dots = document.querySelectorAll('.dot');
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
 
-function showSlide(index) {
+        // Add fade-in animation to elements when they come into view
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
 
-    if (index >= slides.length) currentSlideIndex = 0;
-    else if (index < 0) currentSlideIndex = slides.length - 1;
-    else currentSlideIndex = index;
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in-up');
+                }
+            });
+        }, observerOptions);
 
-    document.getElementById('slider').style.transform = "translateX(-" + currentSlideIndex * 25 + "%)";
-    
-    // Update dots
-    dots.forEach((dot, i) => {
-        dot.classList.toggle('active', i === currentSlideIndex);
-    });
-}
+        // Observe all feature cards and homestay cards
+        document.querySelectorAll('.feature-card, .homestay-card').forEach(card => {
+            observer.observe(card);
+        });
 
-function changeSlide(direction) {
-    currentSlideIndex += direction;
-    showSlide(currentSlideIndex);
-}
+        // Set minimum dates for check-in and check-out
+        const today = new Date().toISOString().split('T')[0];
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
-function currentSlide(index) {
-    currentSlideIndex = index - 1;
-    showSlide(currentSlideIndex);
-}
+        document.getElementById('checkin').min = today;
+        document.getElementById('checkout').min = tomorrowStr;
 
-// Auto slide every 5 seconds
-setInterval(() => {
-    changeSlide(1);
-}, 5000);
-
-// Date picker functions
-function openDatePicker(type) {
-    if (type === 'checkin') {
-        document.getElementById('checkin-input').click();
-    } else if (type === 'checkout') {
-        document.getElementById('checkout-input').click();
-    }
-}
-
-// Add click event listeners to date fields
-/* document.addEventListener('DOMContentLoaded', function() {
-    const checkinField = document.querySelector('.search-field:first-child');
-    const checkoutField = document.querySelector('.search-field:nth-child(2)');
-    
-    if (checkinField) {
-        checkinField.addEventListener('click', function(e) {
-            e.preventDefault();
-            const input = document.getElementById('checkin-input');
-            if (input) {
-                input.click();
+        // Update checkout min date when checkin changes
+        document.getElementById('checkin').addEventListener('change', function() {
+            const checkinDate = new Date(this.value);
+            const nextDay = new Date(checkinDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+            document.getElementById('checkout').min = nextDay.toISOString().split('T')[0];
+            
+            // If checkout date is before new checkin date, update it
+            if (document.getElementById('checkout').value && 
+                new Date(document.getElementById('checkout').value) <= checkinDate) {
+                document.getElementById('checkout').value = nextDay.toISOString().split('T')[0];
             }
         });
-    }
-    
-    if (checkoutField) {
-        checkoutField.addEventListener('click', function(e) {
-            e.preventDefault();
-            const input = document.getElementById('checkout-input');
-            if (input) {
-                input.click();
+
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(10px)';
+            } else {
+                header.style.background = '#fff';
+                header.style.backdropFilter = 'none';
             }
         });
-    }
-    
-    console.log('Date picker event listeners added');
-    
-    // Test function
-    window.testDatePicker = function() {
-        console.log('Testing date picker...');
-        const checkinInput = document.getElementById('checkin-input');
-        const checkoutInput = document.getElementById('checkout-input');
-        console.log('Checkin input:', checkinInput);
-        console.log('Checkout input:', checkoutInput);
-        
-        if (checkinInput) {
-            checkinInput.click();
-        }
-    };
-}); */
-        
-function updateCheckinDate(dateString) {
-    const date = new Date(dateString);
-    const dayNames = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-    const monthNames = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
-    
-    const day = date.getDate();
-    const month = monthNames[date.getMonth()];
-    const year = date.getFullYear();
-    const dayName = dayNames[date.getDay()];
-    
-    document.getElementById('checkin-date').textContent = `${day} tháng ${month} ${year}`;
-    document.getElementById('checkin-day').textContent = dayName;
-}
-
-function updateCheckoutDate(dateString) {
-    const date = new Date(dateString);
-    const dayNames = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-    const monthNames = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
-    
-    const day = date.getDate();
-    const month = monthNames[date.getMonth()];
-    const year = date.getFullYear();
-    const dayName = dayNames[date.getDay()];
-    
-    document.getElementById('checkout-date').textContent = `${day} tháng ${month} ${year}`;
-    document.getElementById('checkout-day').textContent = dayName;
-}
-
-// Room type dropdown functions
-function toggleRoomTypeDropdown() {
-    const dropdown = document.getElementById('room-type-dropdown');
-    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-}
-
-function selectRoomType(type) {
-    document.getElementById('room-type-text').textContent = type;
-    document.getElementById('room-type-dropdown').style.display = 'none';
-}
-
-// Close dropdown when clicking outside
-/* document.addEventListener('click', function(event) {
-    const dropdown = document.getElementById('room-type-dropdown');
-    const roomTypeField = document.querySelector('.search-field:last-child');
-    
-    if (!roomTypeField.contains(event.target)) {
-        dropdown.style.display = 'none';
-    }
-        }); */
     </script>
-
-<%@ include file="partials/footer.jsp" %>
 </body>
 </html>

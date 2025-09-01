@@ -57,4 +57,20 @@ public class HomestayService {
     public java.util.List<Homestay> search(String keyword, String roomType, java.math.BigDecimal minPrice, java.math.BigDecimal maxPrice) {
         return homestayDao.search(keyword, roomType, minPrice, maxPrice);
     }
+    
+    public Homestay getHomestayWithServices(int id) {
+        return homestayDao.getHomestayWithServices(id);
+    }
+    
+    public List<String> getServiceNamesByHomestayId(int homestayId) {
+        return homestayDao.getServiceNamesByHomestayId(homestayId);
+    }
+    
+    public java.math.BigDecimal getMinRoomPriceByHomestayId(int homestayId) {
+        return homestayDao.getMinRoomPriceByHomestayId(homestayId);
+    }
+    
+    public java.util.Map<String, Object> getRoomPriceInfoByHomestayId(int homestayId) {
+        return homestayDao.getRoomPriceInfoByHomestayId(homestayId);
+    }
 }
