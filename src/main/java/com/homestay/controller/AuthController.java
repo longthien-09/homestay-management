@@ -73,11 +73,29 @@ public class AuthController {
     @GetMapping("/home")
     public String home(Model model) {
         // Lấy 3 homestay ngẫu nhiên hiển thị nổi bật
-        java.util.List<com.homestay.model.Homestay> featured =
-                ((com.homestay.service.HomestayService) 
-                 org.springframework.web.context.ContextLoader
-                   .getCurrentWebApplicationContext()
-                   .getBean("homestayService")).getRandomHomestays(3);
+        com.homestay.service.HomestayService homestayService = 
+                (com.homestay.service.HomestayService) 
+                org.springframework.web.context.ContextLoader
+                  .getCurrentWebApplicationContext()
+                  .getBean("homestayService");
+        
+        java.util.List<com.homestay.model.Homestay> featured = homestayService.getRandomHomestays(3);
+        
+        // Lấy services và giá phòng cho mỗi homestay nổi bật
+        for (com.homestay.model.Homestay homestay : featured) {
+            java.util.List<String> services = homestayService.getServiceNamesByHomestayId(homestay.getId());
+            if (!services.isEmpty()) {
+                String currentDesc = homestay.getDescription() != null ? homestay.getDescription() : "";
+                homestay.setDescription(currentDesc + " | Dịch vụ: " + String.join(", ", services));
+            }
+            
+            // Lấy thông tin giá phòng
+            java.util.Map<String, Object> priceInfo = homestayService.getRoomPriceInfoByHomestayId(homestay.getId());
+            if (priceInfo.containsKey("minPrice")) {
+                homestay.setDescription(homestay.getDescription() + " | Giá: " + priceInfo.get("minPrice") + " - " + priceInfo.get("maxPrice"));
+            }
+        }
+        
         model.addAttribute("featuredHomestays", featured);
         return "home";
     }

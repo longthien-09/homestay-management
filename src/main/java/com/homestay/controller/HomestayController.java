@@ -147,6 +147,22 @@ public class HomestayController {
             (roomType != null && !roomType.trim().isEmpty()) ||
             min != null || max != null) {
             java.util.List<Homestay> list = homestayService.search(keyword, roomType, min, max);
+            
+            // Lấy services và giá phòng cho mỗi homestay
+            for (Homestay homestay : list) {
+                List<String> services = homestayService.getServiceNamesByHomestayId(homestay.getId());
+                if (!services.isEmpty()) {
+                    String currentDesc = homestay.getDescription() != null ? homestay.getDescription() : "";
+                    homestay.setDescription(currentDesc + " | Dịch vụ: " + String.join(", ", services));
+                }
+                
+                // Lấy thông tin giá phòng
+                java.util.Map<String, Object> priceInfo = homestayService.getRoomPriceInfoByHomestayId(homestay.getId());
+                if (priceInfo.containsKey("minPrice")) {
+                    homestay.setDescription(homestay.getDescription() + " | Giá: " + priceInfo.get("minPrice") + " - " + priceInfo.get("maxPrice"));
+                }
+            }
+            
             model.addAttribute("homestays", list);
             model.addAttribute("q", keyword);
             model.addAttribute("roomType", roomType);
@@ -171,6 +187,21 @@ public class HomestayController {
             // Lấy tất cả homestay với phân trang
             totalItems = homestayService.getTotalHomestays();
             homestays = homestayService.getAllHomestaysWithPagination(page, size);
+        }
+        
+        // Lấy services và giá phòng cho mỗi homestay
+        for (Homestay homestay : homestays) {
+            List<String> services = homestayService.getServiceNamesByHomestayId(homestay.getId());
+            if (!services.isEmpty()) {
+                String currentDesc = homestay.getDescription() != null ? homestay.getDescription() : "";
+                homestay.setDescription(currentDesc + " | Dịch vụ: " + String.join(", ", services));
+            }
+            
+            // Lấy thông tin giá phòng
+            java.util.Map<String, Object> priceInfo = homestayService.getRoomPriceInfoByHomestayId(homestay.getId());
+            if (priceInfo.containsKey("minPrice")) {
+                homestay.setDescription(homestay.getDescription() + " | Giá: " + priceInfo.get("minPrice") + " - " + priceInfo.get("maxPrice"));
+            }
         }
         
         // Tính toán thông tin phân trang
