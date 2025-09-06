@@ -40,21 +40,4 @@ public class UserController {
         return "user/profile";
     }
 
-    // Admin quản lý user
-    @GetMapping("/list")
-    public String listUsers(Model model, HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
-        if (user == null || !"ADMIN".equals(user.getRole())) return "redirect:/login";
-        List<User> users = userService.getAllUsers();
-        model.addAttribute("users", users);
-        return "admin/user_list";
-    }
-
-    @PostMapping("/setActive")
-    public String setActive(@RequestParam("id") int id, @RequestParam("active") boolean active, HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
-        if (user == null || !"ADMIN".equals(user.getRole())) return "redirect:/login";
-        userService.setActive(id, active);
-        return "redirect:/user/list";
-    }
 }

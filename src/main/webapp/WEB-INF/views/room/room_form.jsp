@@ -24,7 +24,7 @@
 <body>
     <%! private String nn(String s){ if(s==null) return ""; String t=s.trim(); return "null".equalsIgnoreCase(t)?"":s; } %>
     <h2 style="text-align:center;"><%= isEdit ? "Sửa" : "Thêm" %> phòng cho Homestay #<%= homestayId %></h2>
-    <form method="post" enctype="multipart/form-data" action="<%= isEdit ? ("/homestay-management/manager/homestays/" + homestayId + "/rooms/edit") : ("/homestay-management/manager/homestays/" + homestayId + "/rooms/add") %>">
+    <form method="post" action="<%= isEdit ? ("/homestay-management/manager/homestays/" + homestayId + "/rooms/edit") : ("/homestay-management/manager/homestays/" + homestayId + "/rooms/add") %>">
         <% if (isEdit) { %>
             <input type="hidden" name="id" value="<%= room.getId() %>" />
         <% } %>
@@ -54,13 +54,6 @@
         </select>
         <label>Mô tả:</label>
         <textarea name="description"><%= room != null ? nn(room.getDescription()) : "" %></textarea>
-        <label>Hình ảnh:</label>
-        <input type="file" name="imageFile" accept="image/*" />
-        <% if (room != null && room.getImage() != null && !room.getImage().trim().isEmpty()) { %>
-            <div style="margin-top: 5px; font-size: 12px; color: #666;">
-                Ảnh hiện tại: <a href="<%= nn(room.getImage()) %>" target="_blank">Xem ảnh</a>
-            </div>
-        <% } %>
         <button type="submit">Lưu</button>
         <a href="/homestay-management/manager/homestays/<%= homestayId %>/rooms">Hủy</a>
         <a href="/homestay-management/manager/homestays/<%= homestayId %>/rooms" style="margin-left:10px;display:inline-block;padding:6px 12px;border:1px solid #ddd;border-radius:6px;text-decoration:none;color:#333;background:#f8f9fa">← Quay lại</a>

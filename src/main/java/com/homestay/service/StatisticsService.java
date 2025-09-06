@@ -72,4 +72,13 @@ public class StatisticsService {
             return List.of(); // Trả về list rỗng nếu có lỗi
         }
     }
+
+    public java.math.BigDecimal getTotalRevenueByHomestayId(int homestayId) {
+        try {
+            return statisticsDao.getTotalRevenueByHomestayId(homestayId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return java.math.BigDecimal.ZERO;
+        }
+    }
 }

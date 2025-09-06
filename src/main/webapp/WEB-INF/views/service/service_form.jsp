@@ -53,9 +53,10 @@
         <input type="number" step="0.01" name="price" value="<%= service != null && service.getPrice() != null ? service.getPrice() : "" %>" required />
         <label>Mô tả:</label>
         <textarea name="description" required><%= service != null ? nn(service.getDescription()) : "" %></textarea>
-        <button type="submit">Lưu</button>
-        <a href="/homestay-management/manager/services">Hủy</a>
-        <a href="/homestay-management/manager/services" style="margin-left:10px;display:inline-block;padding:6px 12px;border:1px solid #ddd;border-radius:6px;text-decoration:none;color:#333;background:#f8f9fa">← Quay lại</a>
+        <div style="display: flex; gap: 10px; align-items: center; margin-top: 20px;">
+            <button type="submit" style="margin: 0;">Lưu</button>
+            <a href="/homestay-management/manager/services" style="display:inline-block;padding:8px 16px;border:1px solid #ddd;border-radius:6px;text-decoration:none;color:#333;background:#f8f9fa;font-weight:600;">← Quay lại</a>
+        </div>
     </form>
 </div>
 <%@ include file="../partials/footer.jsp" %>

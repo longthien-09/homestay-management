@@ -35,13 +35,17 @@
         <input type="text" name="address" value="<%= homestay != null ? nn(homestay.getAddress()) : "" %>" required/>
         <label>Mô tả:</label>
         <textarea name="description" required><%= homestay != null ? nn(homestay.getDescription()) : "" %></textarea>
-        <label>Hình ảnh:</label>
+        <label>Hình ảnh đại diện:</label>
         <input type="file" name="imageFile" accept="image/*" />
         <% if (homestay != null && homestay.getImage() != null && !homestay.getImage().trim().isEmpty()) { %>
             <div style="margin-top: 5px; font-size: 12px; color: #666;">
                 Ảnh hiện tại: <a href="<%= nn(homestay.getImage()) %>" target="_blank">Xem ảnh</a>
             </div>
         <% } %>
+        <label>Ảnh gallery (có thể chọn nhiều):</label>
+        <input type="file" name="galleryFiles" accept="image/*" multiple />
+        <div style="font-size:12px;color:#666;margin-top:4px">Các ảnh này sẽ hiển thị ở gallery trang chi tiết.</div>
+        
         <label>Email:</label>
         <input type="email" name="email" value="<%= homestay != null ? nn(homestay.getEmail()) : "" %>" placeholder="example@email.com" />
         <label>Số điện thoại:</label>

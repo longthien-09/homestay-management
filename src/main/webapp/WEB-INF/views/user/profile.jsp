@@ -59,7 +59,7 @@
         <p><strong>Trạng thái:</strong> <%= user.isActive() ? "Hoạt động" : "Đã khóa" %></p>
     </div>
     
-    <form method="post" action="<%=request.getContextPath()%>/user/profile">
+    <form method="post" action="<%= (request.getContextPath() != null ? request.getContextPath() : "") %>/user/profile">
         <div class="form-group">
             <label for="username">Tên đăng nhập</label>
             <input type="text" id="username" name="username" value="<%= user.getUsername() != null ? user.getUsername() : "" %>" readonly />

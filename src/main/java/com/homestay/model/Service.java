@@ -6,6 +6,7 @@ public class Service {
     private java.math.BigDecimal price;
     private String description;
     private int homestayId;
+    private Integer categoryId; // nullable until DB updated
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -21,4 +22,7 @@ public class Service {
 
     public int getHomestayId() { return homestayId; }
     public void setHomestayId(int homestayId) { this.homestayId = homestayId; }
+
+    public Integer getCategoryId() { return categoryId; }
+    public void setCategoryId(Integer categoryId) { this.categoryId = categoryId; }
 }

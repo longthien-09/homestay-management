@@ -45,12 +45,9 @@ public class PaymentController {
     public String pay(@PathVariable int id, @RequestParam(value = "method", required = false) String method, HttpSession session) {
         User user = (User) session.getAttribute("currentUser");
         if (user == null) return "redirect:/login";
-        
-        // Thực hiện thanh toán
         paymentService.pay(id, user.getId(), method);
-        
-        // Sau khi thanh toán thành công, redirect về danh sách thanh toán với thông báo
-        return "redirect:/user/payments?success=true&paymentId=" + id;
+        // Sau khi thanh toán thành công, chuyển về lịch sử thanh toán
+        return "redirect:/user/payments";
     }
 
     @GetMapping("/user/payments/{id}/pay")
@@ -73,25 +70,15 @@ public class PaymentController {
                 homestay = homestayService.getHomestayById(room.getHomestayId());
             }
         }
-        // Lấy dịch vụ đã chọn từ session
-        List<String> selectedServiceIds = (List<String>) session.getAttribute("selectedServices_" + bookingId);
-        List<com.homestay.model.Service> selectedServices = null;
+        // Lấy dịch vụ đã chọn từ database thay vì session
+        List<com.homestay.model.Service> selectedServices = serviceService.getServicesByBookingId(bookingId);
         java.math.BigDecimal totalServiceAmount = java.math.BigDecimal.ZERO;
         
-        if (selectedServiceIds != null && !selectedServiceIds.isEmpty()) {
-            selectedServices = new java.util.ArrayList<>();
-            for (String serviceId : selectedServiceIds) {
-                try {
-                    com.homestay.model.Service service = serviceService.getServiceById(Integer.parseInt(serviceId));
-                    if (service != null) {
-                        selectedServices.add(service);
-                        // Cộng tiền dịch vụ
-                        if (service.getPrice() != null) {
-                            totalServiceAmount = totalServiceAmount.add(service.getPrice());
-                        }
-                    }
-                } catch (NumberFormatException e) {
-                    // Bỏ qua ID không hợp lệ
+        if (selectedServices != null && !selectedServices.isEmpty()) {
+            for (com.homestay.model.Service service : selectedServices) {
+                // Cộng tiền dịch vụ
+                if (service.getPrice() != null) {
+                    totalServiceAmount = totalServiceAmount.add(service.getPrice());
                 }
             }
         }
@@ -123,13 +110,16 @@ public class PaymentController {
         return "payment/manager_payment_list";
     }
 
-    // Manager: xác nhận thanh toán
+    // Manager: xác nhận thanh toán tiền mặt
     @PostMapping("/manager/payments/{id}/confirm")
-    public String confirmPayment(@PathVariable int id, HttpSession session) {
+    public String confirmCashPayment(@PathVariable int id, HttpSession session) {
         User user = (User) session.getAttribute("currentUser");
         if (user == null || !"MANAGER".equals(user.getRole())) return "redirect:/login";
         
-        paymentService.confirmPayment(id);
-        return "redirect:/manager/payments?success=true&paymentId=" + id;
+        boolean success = paymentService.confirmCashPayment(id);
+        if (success) {
+            // Có thể thêm thông báo thành công
+        }
+        return "redirect:/manager/payments";
     }
 }

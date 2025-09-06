@@ -1,82 +1,221 @@
 package com.homestay.controller;
 
+import com.homestay.service.RoomService;
+import com.homestay.service.HomestayService;
+import com.homestay.dao.ManagerHomestayDao;
+import com.homestay.model.Room;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.homestay.model.Homestay;
-import com.homestay.model.Room;
-import com.homestay.service.HomestayService;
-import com.homestay.service.RoomService;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import java.util.List;
+// removed duplicate import
+import javax.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/room")
 public class RoomController {
-
-    @Autowired
-    private HomestayService homestayService;
-
     @Autowired
     private RoomService roomService;
+    @Autowired
+    private HomestayService homestayService;
+    @Autowired
+    private ManagerHomestayDao managerHomestayDao;
 
-    @GetMapping("/{roomId}")
-    public String getRoomDetail(@PathVariable int roomId, Model model) {
-        try {
-            // Lấy thông tin phòng
-            Room room = roomService.getRoomById(roomId);
-            if (room == null) {
-                // Nếu không tìm thấy phòng, tạo dữ liệu mẫu
-                room = createSampleRoom();
+    @GetMapping("/rooms")
+    public String listRooms(Model model) {
+        List<Room> rooms = roomService.getAllRooms();
+        model.addAttribute("rooms", rooms);
+        return "room/list";
+    }
+
+
+    // Hiển thị danh sách phòng cho manager theo homestay
+    @GetMapping("/manager/homestays/{homestayId}/rooms")
+    public String managerListRooms(@PathVariable("homestayId") int homestayId, Model model, HttpSession session) {
+        model.addAttribute("homestayId", homestayId);
+        model.addAttribute("rooms", roomService.getRoomsByHomestayId(homestayId));
+        
+        // Thêm tên homestay để hiển thị trong header
+        com.homestay.model.Homestay hs = ((com.homestay.service.HomestayService)
+                org.springframework.web.context.ContextLoader.getCurrentWebApplicationContext()
+                .getBean("homestayService")).getHomestayById(homestayId);
+        if (hs != null) model.addAttribute("homestayName", hs.getName());
+        
+        return "room/list";
+    }
+    @GetMapping("/manager/homestays/{homestayId}/rooms/add")
+    public String managerAddRoomForm(@PathVariable("homestayId") int homestayId, Model model, HttpSession session) {
+        model.addAttribute("homestayId", homestayId);
+        model.addAttribute("room", new com.homestay.model.Room());
+        model.addAttribute("isEdit", false);
+        // Nếu manager có nhiều homestay, cung cấp danh sách để chọn
+        com.homestay.model.User currentUser = (com.homestay.model.User) session.getAttribute("currentUser");
+        if (currentUser != null && "MANAGER".equals(currentUser.getRole())) {
+            java.util.List<Integer> ids = managerHomestayDao.getHomestayIdsByManager(currentUser.getId());
+            java.util.List<com.homestay.model.Homestay> options = new java.util.ArrayList<>();
+            for (Integer id : ids) {
+                com.homestay.model.Homestay hs = homestayService.getHomestayById(id);
+                if (hs != null) options.add(hs);
             }
+            model.addAttribute("homestayOptions", options);
+        }
+        return "room/room_form";
+    }
+    @PostMapping("/manager/homestays/{homestayId}/rooms/add")
+    public String managerAddRoom(@PathVariable("homestayId") int homestayId,
+                                 @ModelAttribute com.homestay.model.Room room,
+                                 @RequestParam(value = "homestayId", required = false) Integer formHomestayId) {
+        int targetHomestayId = (formHomestayId != null) ? formHomestayId : homestayId;
+        room.setHomestayId(targetHomestayId);
+        roomService.addRoom(room);
+        return "redirect:/manager/homestays/" + targetHomestayId + "/rooms";
+    }
+    @GetMapping("/manager/homestays/{homestayId}/rooms/edit/{roomId}")
+    public String managerEditRoomForm(@PathVariable("homestayId") int homestayId, @PathVariable("roomId") int roomId, Model model, HttpSession session) {
+        model.addAttribute("homestayId", homestayId);
+        model.addAttribute("room", roomService.getRoomById(roomId));
+        model.addAttribute("isEdit", true);
+        com.homestay.model.User currentUser = (com.homestay.model.User) session.getAttribute("currentUser");
+        if (currentUser != null && "MANAGER".equals(currentUser.getRole())) {
+            java.util.List<Integer> ids = managerHomestayDao.getHomestayIdsByManager(currentUser.getId());
+            java.util.List<com.homestay.model.Homestay> options = new java.util.ArrayList<>();
+            for (Integer id : ids) {
+                com.homestay.model.Homestay hs = homestayService.getHomestayById(id);
+                if (hs != null) options.add(hs);
+            }
+            model.addAttribute("homestayOptions", options);
+        }
+        return "room/room_form";
+    }
+    @PostMapping("/manager/homestays/{homestayId}/rooms/edit")
+    public String managerEditRoom(@PathVariable("homestayId") int homestayId,
+                                  @ModelAttribute com.homestay.model.Room room,
+                                  @RequestParam(value = "homestayId", required = false) Integer formHomestayId) {
+        int targetHomestayId = (formHomestayId != null) ? formHomestayId : homestayId;
+        room.setHomestayId(targetHomestayId);
+        roomService.updateRoom(room);
+        return "redirect:/manager/homestays/" + targetHomestayId + "/rooms";
+    }
+    @GetMapping("/manager/homestays/{homestayId}/rooms/delete/{roomId}")
+    public String managerDeleteRoom(@PathVariable("homestayId") int homestayId, @PathVariable("roomId") int roomId) {
+        roomService.deleteRoom(roomId);
+        return "redirect:/manager/homestays/" + homestayId + "/rooms";
+    }
 
-            // Lấy thông tin homestay
-            Homestay homestay = null;
-            if (room.getHomestayId() > 0) {
-                homestay = homestayService.getHomestayById(room.getHomestayId());
+
+    // Endpoint tìm kiếm phòng trống từ dashboard
+    @GetMapping("/manager/search-rooms")
+    public String searchAvailableRooms(@RequestParam("homestayId") int homestayId,
+                                      @RequestParam("checkInDate") String checkInDate,
+                                      @RequestParam("checkOutDate") String checkOutDate,
+                                      @RequestParam(value = "roomType", required = false) String roomType,
+                                      @RequestParam(value = "maxPrice", required = false) String maxPrice,
+                                      Model model, HttpSession session) {
+        
+        // Kiểm tra quyền truy cập
+        com.homestay.model.User currentUser = (com.homestay.model.User) session.getAttribute("currentUser");
+        if (currentUser == null || !"MANAGER".equals(currentUser.getRole())) {
+            return "redirect:/login";
+        }
+        
+        // Kiểm tra xem manager có quản lý homestay này không
+        java.util.List<Integer> managedHomestayIds = managerHomestayDao.getHomestayIdsByManager(currentUser.getId());
+        if (!managedHomestayIds.contains(homestayId)) {
+            return "redirect:/manager/dashboard";
+        }
+        
+        try {
+            java.time.LocalDate checkIn = java.time.LocalDate.parse(checkInDate);
+            java.time.LocalDate checkOut = java.time.LocalDate.parse(checkOutDate);
+            
+            // Lấy danh sách phòng cơ bản
+            List<Room> allRooms = roomService.getRoomsByHomestayId(homestayId);
+            List<Room> availableRooms = new java.util.ArrayList<>();
+            
+            // Lấy danh sách phòng đã được đặt trong khoảng thời gian
+            List<Integer> bookedRoomIds = getBookedRoomIdsInDateRange(homestayId, checkIn, checkOut);
+            
+            // Lọc phòng trống và áp dụng các filter khác
+            for (Room room : allRooms) {
+                // Chỉ lấy phòng trống (không có trong danh sách đã đặt)
+                if (!bookedRoomIds.contains(room.getId())) {
+                    // Lọc theo loại phòng
+                    if (roomType != null && !roomType.trim().isEmpty() && !roomType.equals(room.getType())) {
+                        continue;
+                    }
+                    
+                    // Lọc theo giá tối đa
+                    if (maxPrice != null && !maxPrice.trim().isEmpty()) {
+                        try {
+                            java.math.BigDecimal maxPriceBD = new java.math.BigDecimal(maxPrice);
+                            if (room.getPrice() == null || room.getPrice().compareTo(maxPriceBD) > 0) {
+                                continue;
+                            }
+                        } catch (NumberFormatException e) {
+                            // Bỏ qua filter giá nếu không hợp lệ
+                        }
+                    }
+                    
+                    availableRooms.add(room);
+                }
             }
             
-            if (homestay == null) {
-                // Nếu không tìm thấy homestay, tạo dữ liệu mẫu
-                homestay = createSampleHomestay();
+            // Thêm thông tin vào model
+            model.addAttribute("homestayId", homestayId);
+            model.addAttribute("rooms", availableRooms);
+            model.addAttribute("checkInDate", checkInDate);
+            model.addAttribute("checkOutDate", checkOutDate);
+            model.addAttribute("roomType", roomType);
+            model.addAttribute("maxPrice", maxPrice);
+            
+            // Thêm tên homestay
+            com.homestay.model.Homestay hs = homestayService.getHomestayById(homestayId);
+            if (hs != null) {
+                model.addAttribute("homestayName", hs.getName());
             }
-
-            // Thêm vào model
-            model.addAttribute("room", room);
-            model.addAttribute("homestay", homestay);
-
-            return "room-detail";
+            
+            return "room/search_results";
+            
         } catch (Exception e) {
-            // Xử lý lỗi và trả về dữ liệu mẫu
-            model.addAttribute("room", createSampleRoom());
-            model.addAttribute("homestay", createSampleHomestay());
-            return "room-detail";
+            e.printStackTrace();
+            return "redirect:/manager/dashboard";
         }
     }
-
-    // Tạo dữ liệu mẫu cho phòng
-    private Room createSampleRoom() {
-        Room room = new Room();
-        room.setId(1);
-        room.setRoomNumber("DLX001");
-        room.setType("Deluxe View Biển");
-        room.setPrice(new java.math.BigDecimal("1500000"));
-        room.setStatus("Available");
-        room.setDescription("Phòng Deluxe View Biển với thiết kế hiện đại, rộng rãi 45m², view biển tuyệt đẹp.");
-        room.setHomestayId(1);
-        room.setImage("https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80");
-        return room;
-    }
-
-    // Tạo dữ liệu mẫu cho homestay
-    private Homestay createSampleHomestay() {
-        Homestay homestay = new Homestay();
-        homestay.setId(1);
-        homestay.setName("Homestay Biển Quy Nhơn Premium");
-        homestay.setAddress("Quy Nhơn, Bình Định");
-        homestay.setDescription("Homestay cao cấp với view biển tuyệt đẹp, tiện nghi hiện đại và dịch vụ 5 sao. Nằm ở vị trí đắc địa, cách biển chỉ 50m, Homestay Biển Quy Nhơn Premium mang đến cho bạn trải nghiệm nghỉ dưỡng hoàn hảo với không gian thoáng đãng, thiết kế hiện đại và dịch vụ chuyên nghiệp.");
-        return homestay;
+    
+    // Helper method để lấy danh sách ID phòng đã được đặt trong khoảng thời gian
+    private List<Integer> getBookedRoomIdsInDateRange(int homestayId, java.time.LocalDate checkIn, java.time.LocalDate checkOut) {
+        List<Integer> bookedRoomIds = new java.util.ArrayList<>();
+        try {
+            // Query để lấy các phòng đã được đặt trong khoảng thời gian
+            String sql = "SELECT DISTINCT r.id FROM rooms r " +
+                        "INNER JOIN bookings b ON r.id = b.room_id " +
+                        "WHERE r.homestay_id = ? " +
+                        "AND b.status IN ('PENDING', 'CONFIRMED') " +
+                        "AND NOT (b.check_out <= ? OR b.check_in >= ?)";
+            
+            javax.sql.DataSource dataSource = (javax.sql.DataSource) org.springframework.web.context.ContextLoader
+                    .getCurrentWebApplicationContext()
+                    .getBean("dataSource");
+            
+            try (java.sql.Connection conn = dataSource.getConnection();
+                 java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, homestayId);
+                ps.setDate(2, java.sql.Date.valueOf(checkIn));
+                ps.setDate(3, java.sql.Date.valueOf(checkOut));
+                
+                try (java.sql.ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        bookedRoomIds.add(rs.getInt("id"));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bookedRoomIds;
     }
 }

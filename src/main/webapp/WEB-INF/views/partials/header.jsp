@@ -2,6 +2,7 @@
 <%@ page import="com.homestay.model.User" %>
 <%
     String ctx = request.getContextPath();
+    if (ctx == null) ctx = "";
     User currentUser = (User) session.getAttribute("currentUser");
 %>
 <style>
@@ -31,11 +32,6 @@ html, body { margin:0; padding:0; }
 <header class="site-header">
     <div class="brand"><a href="<%= (currentUser != null && "MANAGER".equals(currentUser.getRole())) ? (ctx+"/manager/dashboard") : (ctx+"/home") %>" style="color:#fff; text-decoration:none;">Homestay Management</a></div>
     <nav class="menu-center">
-        <a href="<%= (currentUser != null && "MANAGER".equals(currentUser.getRole())) ? (ctx+"/manager/dashboard") : (ctx+"/home") %>">Trang chủ</a>
-        <% if (currentUser == null || !"MANAGER".equals(currentUser.getRole())) { %>
-            <a href="<%=ctx%>/homestays">Homestays</a>
-            <a href="<%=ctx%>/services">Services</a>
-        <% } %>
     </nav>
     <div class="header-right">
         <a class="cta" href="<%=ctx%>/manager/register">Đăng ký quản lý homestay</a>
