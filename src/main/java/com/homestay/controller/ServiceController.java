@@ -1,16 +1,21 @@
 package com.homestay.controller;
 
-import com.homestay.model.Service;
-import com.homestay.model.User;
-import com.homestay.service.ServiceService;
-import com.homestay.dao.ManagerHomestayDao;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpSession;
-import java.util.List;
+import com.homestay.dao.ManagerHomestayDao;
+import com.homestay.model.Service;
+import com.homestay.model.User;
+import com.homestay.service.ServiceService;
 
 @Controller
 public class ServiceController {
@@ -35,8 +40,15 @@ public class ServiceController {
             if (h != null) options.add(h);
         }
         int targetHomestayId = (homestayIdParam != null) ? homestayIdParam : (homestayIds.isEmpty() ? 0 : homestayIds.get(0));
-        java.util.List<com.homestay.model.Service> services = serviceService.getServicesByHomestayId(targetHomestayId);
-        model.addAttribute("services", services);
+        
+        // Lấy dịch vụ hiện tại của homestay
+        java.util.List<com.homestay.model.Service> currentServices = serviceService.getServicesByHomestayId(targetHomestayId);
+        
+        // Lấy tất cả dịch vụ có sẵn từ database (loại bỏ trùng lặp)
+        java.util.List<com.homestay.model.Service> allAvailableServices = serviceService.getDistinctServices();
+        
+        model.addAttribute("services", currentServices);
+        model.addAttribute("allAvailableServices", allAvailableServices);
         model.addAttribute("homestayOptions", options);
         model.addAttribute("homestayId", targetHomestayId);
         return "service/service_list";
@@ -138,81 +150,31 @@ public class ServiceController {
         return "redirect:/manager/services";
     }
 
-    @GetMapping("/services")
-    public String publicServiceSlider(Model model) {
-        java.util.List<com.homestay.model.Service> services = serviceService.getAllServices();
-        model.addAttribute("services", services);
-        return "service/service_slider";
-    }
-
-    // User chọn dịch vụ cho booking của mình
-    @GetMapping("/user/services/book")
-    public String showServiceBookingForm(Model model, javax.servlet.http.HttpSession session,
-                                         @org.springframework.web.bind.annotation.RequestParam(value = "bookingId", required = false) Integer bookingId,
-                                         @org.springframework.web.bind.annotation.RequestParam(value = "homestayId", required = false) Integer homestayId) {
-        com.homestay.model.User currentUser = (com.homestay.model.User) session.getAttribute("currentUser");
-        if (currentUser == null) return "redirect:/login";
-        // Lấy danh sách booking hợp lệ của user
-        java.util.List<java.util.Map<String,Object>> bookings = ((com.homestay.service.BookingService)
-                org.springframework.web.context.ContextLoader.getCurrentWebApplicationContext().getBean("bookingService"))
-                .getActiveBookingsByUser(currentUser.getId());
-        if (bookings == null || bookings.isEmpty()) {
-            model.addAttribute("error", "Bạn cần có đặt phòng trước khi chọn dịch vụ.");
-            model.addAttribute("message", "Bạn cần có đặt phòng trước khi chọn dịch vụ.");
-            return "service/service_booking_form";
+    @PostMapping("/manager/services/delete-by-name")
+    @ResponseBody
+    public String deleteServiceByName(@RequestParam("name") String name, 
+                                    @RequestParam("homestayId") int homestayId, 
+                                    HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null || !"MANAGER".equals(currentUser.getRole())) {
+            return "error";
         }
-        // Xác định homestayId mục tiêu
-        Integer targetHomestayId = homestayId;
-        if (targetHomestayId == null && bookingId != null) {
-            for (java.util.Map<String,Object> b : bookings) {
-                if (((Integer)b.get("booking_id")).equals(bookingId)) { targetHomestayId = (Integer) b.get("homestay_id"); break; }
+        
+        // Kiểm tra quyền truy cập homestay
+        java.util.List<Integer> managerHomestayIds = managerHomestayDao.getHomestayIdsByManager(currentUser.getId());
+        if (!managerHomestayIds.contains(homestayId)) {
+            return "error";
+        }
+        
+        // Tìm và xóa dịch vụ theo tên
+        java.util.List<com.homestay.model.Service> services = serviceService.getServicesByHomestayId(homestayId);
+        for (com.homestay.model.Service service : services) {
+            if (service.getName().equals(name)) {
+                serviceService.deleteService(service.getId());
+                return "success";
             }
-        }
-        // Nếu chưa xác định, lấy từ booking đầu tiên
-        if (targetHomestayId == null) targetHomestayId = (Integer) bookings.get(0).get("homestay_id");
-        // Dịch vụ theo homestay
-        java.util.List<com.homestay.model.Service> services = serviceService.getServicesByHomestayId(targetHomestayId);
-        model.addAttribute("bookings", bookings);
-        model.addAttribute("services", services);
-        model.addAttribute("selectedBookingId", bookingId != null ? bookingId : (Integer) bookings.get(0).get("booking_id"));
-        return "service/service_booking_form";
-    }
-
-    @org.springframework.web.bind.annotation.PostMapping("/user/services/book")
-    public String submitServiceBooking(javax.servlet.http.HttpServletRequest request,
-                                       javax.servlet.http.HttpSession session,
-                                       Model model,
-                                       @org.springframework.web.bind.annotation.RequestParam("bookingId") int bookingId,
-                                       @org.springframework.web.bind.annotation.RequestParam(value = "serviceIds", required = false) java.util.List<Integer> serviceIds) {
-        com.homestay.model.User currentUser = (com.homestay.model.User) session.getAttribute("currentUser");
-        if (currentUser == null) return "redirect:/login";
-        if (serviceIds != null && !serviceIds.isEmpty()) {
-            ((com.homestay.service.BookingService) org.springframework.web.context.ContextLoader.getCurrentWebApplicationContext().getBean("bookingService"))
-                .saveSelectedServices(bookingId, serviceIds);
-            // Lưu vào session để trang thanh toán hiển thị danh sách và tính tổng dịch vụ
-            java.util.List<String> idsAsString = new java.util.ArrayList<>();
-            for (Integer id : serviceIds) idsAsString.add(String.valueOf(id));
-            session.setAttribute("selectedServices_" + bookingId, idsAsString);
-        }
-        
-        // Luôn tạo payment mới cho dịch vụ để user có thể thanh toán
-        com.homestay.service.PaymentService paymentService = (com.homestay.service.PaymentService)
-                org.springframework.web.context.ContextLoader.getCurrentWebApplicationContext().getBean("paymentService");
-        
-        // Tính tổng tiền dịch vụ
-        java.math.BigDecimal totalServiceAmount = java.math.BigDecimal.ZERO;
-        if (serviceIds != null && !serviceIds.isEmpty()) {
-            for (Integer serviceId : serviceIds) {
-                com.homestay.model.Service service = serviceService.getServiceById(serviceId);
-                if (service != null && service.getPrice() != null) {
-                    totalServiceAmount = totalServiceAmount.add(service.getPrice());
-                }
-            }
-        }
-        
-        // Tạo payment mới với số tiền dịch vụ
-        int newPaymentId = paymentService.createPayment(bookingId, totalServiceAmount);
-        return "redirect:/user/payments/" + newPaymentId + "/pay?origin=service";
+		}
+        return "not_found";
     }
 
     @GetMapping("/homestays/{homestayId}/services/json")

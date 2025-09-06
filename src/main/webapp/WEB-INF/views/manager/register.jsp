@@ -27,7 +27,7 @@
     <% if (request.getAttribute("message") != null) { %>
         <div class="message"><%= request.getAttribute("message") %></div>
     <% } %>
-    <form method="post" action="<%=request.getContextPath()%>/manager/register">
+    <form method="post" action="<%= (request.getContextPath() != null ? request.getContextPath() : "") %>/manager/register">
         <div class="grid">
             <div class="full">
                 <label for="username">Tên đăng nhập</label>

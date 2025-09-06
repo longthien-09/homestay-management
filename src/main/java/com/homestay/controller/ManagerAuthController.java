@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class ManagerAuthController {
@@ -95,19 +98,53 @@ public class ManagerAuthController {
         if (currentUser == null || !"MANAGER".equals(currentUser.getRole())) {
             return "redirect:/login";
         }
-        // Lấy danh sách homestayId manager quản lý
         java.util.List<Integer> homestayIds = managerHomestayDao.getHomestayIdsByManager(currentUser.getId());
         java.util.List<com.homestay.model.Homestay> homestays = new java.util.ArrayList<>();
         java.util.Map<Integer, java.util.List<com.homestay.model.Room>> roomsByHomestay = new java.util.HashMap<>();
+        java.util.Map<Integer, java.math.BigDecimal> revenueByHomestay = new java.util.HashMap<>();
+        java.util.Map<Integer, Integer> availableRoomsByHomestay = new java.util.HashMap<>();
         for (Integer id : homestayIds) {
             com.homestay.model.Homestay h = homestayService.getHomestayById(id);
             if (h != null) {
                 homestays.add(h);
-                roomsByHomestay.put(id, roomService.getRoomsByHomestayId(id));
+                java.util.List<com.homestay.model.Room> rooms = roomService.getRoomsByHomestayId(id);
+                roomsByHomestay.put(id, rooms);
+                int available = 0;
+                for (com.homestay.model.Room r : rooms) {
+                    if (r.getStatus() != null && (r.getStatus().equalsIgnoreCase("AVAILABLE") || r.getStatus().equalsIgnoreCase("TRONG"))) {
+                        available++;
+                    }
+                }
+                availableRoomsByHomestay.put(id, available);
+                java.math.BigDecimal revenue = statisticsService.getTotalRevenueByHomestayId(id);
+                revenueByHomestay.put(id, revenue);
             }
         }
         model.addAttribute("homestays", homestays);
         model.addAttribute("roomsByHomestay", roomsByHomestay);
+        model.addAttribute("revenueByHomestay", revenueByHomestay);
+        model.addAttribute("availableRoomsByHomestay", availableRoomsByHomestay);
+        // Thêm dữ liệu thống kê tổng quan và biểu đồ
+        model.addAttribute("overviewStats", statisticsService.getOverviewStatistics(currentUser.getId()));
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            List<Map<String, Object>> monthlyRevenue = statisticsService.getMonthlyRevenue(currentUser.getId());
+            List<Map<String, Object>> monthlyBookings = statisticsService.getMonthlyBookings(currentUser.getId());
+            
+            
+            
+            String monthlyRevenueJson = mapper.writeValueAsString(monthlyRevenue);
+            String monthlyBookingsJson = mapper.writeValueAsString(monthlyBookings);
+            
+            
+            
+            model.addAttribute("monthlyRevenueJson", monthlyRevenueJson);
+            model.addAttribute("monthlyBookingsJson", monthlyBookingsJson);
+        } catch (Exception e) {
+            
+            model.addAttribute("monthlyRevenueJson", "[]");
+            model.addAttribute("monthlyBookingsJson", "[]");
+        }
         return "manager/dashboard";
     }
 
@@ -142,7 +179,9 @@ public class ManagerAuthController {
         model.addAttribute("overviewStats", statisticsService.getOverviewStatistics(currentUser.getId()));
         model.addAttribute("monthlyRevenue", statisticsService.getMonthlyRevenue(currentUser.getId()));
         model.addAttribute("monthlyBookings", statisticsService.getMonthlyBookings(currentUser.getId()));
-        model.addAttribute("serviceStats", statisticsService.getServiceStatistics(currentUser.getId()));
+        
+        List<Map<String, Object>> serviceStats = statisticsService.getServiceStatistics(currentUser.getId());
+        model.addAttribute("serviceStats", serviceStats);
         return "manager/statistics";
     }
 }

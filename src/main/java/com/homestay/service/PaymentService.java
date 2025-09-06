@@ -30,14 +30,11 @@ public class PaymentService {
             int bookingId = (int) payment.get("booking_id");
             com.homestay.model.Booking booking = bookingDao.findById(bookingId);
             if (booking != null && booking.getUserId() == userId) {
-                // Chuyển thành PENDING thay vì PAID
-                paymentDao.updateStatusAndMethod(paymentId, "PENDING", method);
+                // Nếu chọn tiền mặt → Chờ xử lý, nếu chọn chuyển khoản → Đã thanh toán
+                String status = "CASH".equals(method) ? "PENDING" : "PAID";
+                paymentDao.updateStatusAndMethod(paymentId, status, method);
             }
         }
-    }
-
-    public void confirmPayment(int paymentId) {
-        paymentDao.updateStatus(paymentId, "PAID");
     }
 
     public int createPayment(int bookingId, java.math.BigDecimal amount) {
@@ -50,5 +47,15 @@ public class PaymentService {
 
     public Map<String,Object> getLatestPaymentByBooking(int bookingId) {
         return paymentDao.findByBookingId(bookingId);
+    }
+
+    // Manager xác nhận thanh toán tiền mặt (chuyển từ PENDING thành PAID)
+    public boolean confirmCashPayment(int paymentId) {
+        Map<String,Object> payment = paymentDao.findById(paymentId);
+        if (payment != null && "PENDING".equals(payment.get("status"))) {
+            paymentDao.updateStatus(paymentId, "PAID");
+            return true;
+        }
+        return false;
     }
 }

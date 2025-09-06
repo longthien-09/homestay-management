@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.List, java.util.Map, com.homestay.model.Room, com.homestay.model.Service" %>
+<%@ page import="com.homestay.model.Service, java.math.BigDecimal" %>
+<%@ page import="java.util.List, java.util.Map, com.homestay.model.Room" %>
 <%@ include file="../partials/header.jsp" %>
 <%! private String formatPrice(java.math.BigDecimal price) { 
     if (price == null) return "0₫";
@@ -20,6 +21,8 @@
     String qrBooking = booking != null ? String.valueOf(booking.getId()) : "";
     String qrContent = "Thanh toan booking #" + qrBooking;
     String qrUrl = "https://img.vietqr.io/image/" + qrBank + "-" + qrAccount + "-compact2.png?amount=" + qrAmount + "&addInfo=" + java.net.URLEncoder.encode(qrContent, "UTF-8") + "&accountName=" + java.net.URLEncoder.encode(qrName, "UTF-8");
+    // Sửa lỗi ép kiểu BigDecimal cho tổng tiền
+    BigDecimal displayAmount = totalAmount != null ? totalAmount : (payment != null && payment.get("amount") != null ? (BigDecimal) payment.get("amount") : null);
 %>
 <!DOCTYPE html>
 <html>
@@ -66,38 +69,6 @@
         .status-PAID { color: #28a745; }
         .status-UNPAID { color: #e67e22; }
         .form-group { margin-bottom: 18px; }
-        .form-group label { 
-            display: block; 
-            margin-bottom: 8px; 
-            font-weight: 600; 
-            color: #2c3e50; 
-            font-size: 1.05em; 
-        }
-        .form-group select { 
-            width: 100%; 
-            padding: 12px 16px; 
-            border: 2px solid #e9ecef; 
-            border-radius: 10px; 
-            font-size: 1em; 
-            background: #fff; 
-            color: #2c3e50; 
-            transition: all 0.3s ease; 
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 16px;
-            padding-right: 40px;
-        }
-        .form-group select:focus { 
-            outline: none; 
-            border-color: #20c997; 
-            box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.1); 
-        }
-        .form-group select:hover { 
-            border-color: #20c997; 
-        }
         .btn {
             padding: 12px 28px; border-radius: 8px; border: none; background: linear-gradient(90deg,#20c997,#0dcaf0);
             color: #fff; font-weight: 700; font-size: 1.1em; cursor: pointer; box-shadow: 0 2px 8px #b2f0e6;
@@ -117,9 +88,80 @@
         .price-breakdown { background: #f8f9fa; border-radius: 8px; padding: 16px; margin: 16px 0; border: 1px solid #e9ecef; }
         .price-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
         .price-row.total { border-top: 2px solid #dee2e6; padding-top: 8px; margin-top: 8px; font-weight: bold; font-size: 1.1em; color: #20c997; }
+        /* Progress Bar Styles */
+        .progress-container {
+            background: #fff;
+            padding: 24px 36px;
+            border-bottom: 1px solid #e9ecef;
+            max-width: 1200px;
+            margin: 0 auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .progress-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .progress-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .step:not(:last-child)::after {
+            content: '';
+            width: 60px;
+            height: 2px;
+            background: #e9ecef;
+            margin: 0 20px;
+        }
+        .step.completed:not(:last-child)::after {
+            background: #1e40af;
+        }
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1em;
+            color: #fff;
+            background: #e9ecef;
+            position: relative;
+            z-index: 2;
+        }
+        .step.completed .step-icon {
+            background: #1e40af;
+        }
+        .step.active .step-icon {
+            background: #1e40af;
+        }
+        .step-text {
+            margin-left: 12px;
+            font-weight: 600;
+            color: #6b7280;
+        }
+        .step.completed .step-text {
+            color: #1e40af;
+        }
+        .step.active .step-text {
+            color: #1e40af;
+        }
         @media (max-width: 900px) {
             .main { flex-direction: column; gap: 18px; padding: 18px 6vw; }
             .header { flex-direction: column; align-items: flex-start; gap: 8px; padding: 18px 6vw 12px 6vw; }
+            .progress-container { padding: 20px 6vw; }
+            .progress-steps { flex-direction: column; gap: 16px; }
+            .step:not(:last-child)::after { display: none; }
+            .step { width: 100%; justify-content: flex-start; }
         }
     </style>
     <script>
@@ -137,6 +179,26 @@
     </script>
 </head>
 <body>
+
+<!-- Progress Bar -->
+<div class="progress-container">
+    <div class="progress-title">Đặt phòng</div>
+    <div class="progress-steps">
+        <div class="step completed">
+            <div class="step-icon">✓</div>
+            <div class="step-text">Lựa chọn của bạn</div>
+        </div>
+        <div class="step completed">
+            <div class="step-icon">✓</div>
+            <div class="step-text">Nhập thông tin chi tiết của bạn</div>
+        </div>
+        <div class="step active">
+            <div class="step-icon">3</div>
+            <div class="step-text">Xác nhận đặt phòng của bạn</div>
+        </div>
+    </div>
+</div>
+
 <div class="container">
     <div class="header">
         <div class="logo"><i class="fa-solid fa-money-check-dollar"></i></div>
@@ -147,11 +209,6 @@
     </div>
     <div class="main">
         <div class="main-left">
-            <% if (room != null && room.getImage() != null && !room.getImage().isEmpty()) { %>
-                <img class="homestay-img" src="<%= room.getImage() %>" alt="Ảnh phòng" />
-            <% } else { %>
-                <img class="homestay-img" src="https://cdn-icons-png.flaticon.com/512/2356/2356787.png" alt="Ảnh phòng" />
-            <% } %>
             <% if (homestay != null) { %>
             <div class="info-row"><span class="label">Homestay:</span> <span class="value"><%= homestay.getName() %></span></div>
             <div class="info-row"><span class="label">Địa chỉ:</span> <span class="value"><%= homestay.getAddress() != null ? homestay.getAddress() : "-" %></span></div>
@@ -162,7 +219,6 @@
             <% if (booking != null) { %>
             <div class="info-row"><span class="label">Ngày nhận:</span> <span class="value"><%= booking.getCheckIn() %></span></div>
             <div class="info-row"><span class="label">Ngày trả:</span> <span class="value"><%= booking.getCheckOut() %></span></div>
-            <div class="info-row"><span class="label">Mã booking:</span> <span class="value">#<%= booking.getId() %></span></div>
             <% } %>
             
             <!-- Phần dịch vụ đã chọn -->
@@ -200,11 +256,11 @@
                 <% } %>
                 <div class="price-row total">
                     <span>Tổng tiền:</span>
-                    <span><%= formatPrice(totalAmount != null ? totalAmount : (payment.get("amount") != null ? (java.math.BigDecimal)payment.get("amount") : null)) %></span>
+                    <span><%= formatPrice(totalAmount) %></span>
                 </div>
             </div>
             
-            <div class="info-row"><span class="label">Trạng thái:</span> <span class="status status-<%= payment.get("status") %>"><%= payment.get("status") %></span></div>
+            
             <form method="post" action="/homestay-management/user/payments/<%= payment.get("id") %>/pay">
                 <div class="form-group">
                     <label for="method">Phương thức thanh toán:</label>

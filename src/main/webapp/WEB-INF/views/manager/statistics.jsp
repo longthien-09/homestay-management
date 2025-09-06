@@ -17,26 +17,107 @@
     <meta charset="UTF-8">
     <title>Báo cáo thống kê - Quản lý Homestay</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6fb; margin: 0; padding: 0; }
-        .stat-container { max-width: 1100px; margin: 40px auto; background: #fff; border-radius: 18px; box-shadow: 0 6px 32px rgba(0,0,0,0.08); padding: 40px 36px 30px 36px; }
-        .stat-header { font-size: 2em; font-weight: 700; color: #2c3e50; margin-bottom: 30px; text-align: center; }
-        .stat-grid { display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; }
-        .stat-box { flex: 1 1 220px; background: linear-gradient(135deg, #667eea 0%, #20c997 100%); color: #fff; border-radius: 14px; padding: 32px 28px; box-shadow: 0 2px 12px rgba(102,126,234,0.08); display: flex; flex-direction: column; align-items: center; min-width: 220px; margin-bottom: 24px; }
-        .stat-box .icon { font-size: 2.5em; margin-bottom: 14px; opacity: 0.92; }
-        .stat-box .label { font-size: 1.1em; margin-bottom: 8px; opacity: 0.95; }
-        .stat-box .value { font-size: 2.2em; font-weight: 700; letter-spacing: 1px; }
-        .charts-section { margin-top: 40px; }
-        .chart-card { background: #f8f9fa; border-radius: 14px; box-shadow: 0 1px 6px #e3e6f0; padding: 16px 14px; margin-bottom: 22px; }
-        .chart-title { font-size: 1em; font-weight: 600; color: #2c3e50; margin-bottom: 12px; text-align: center; }
-        .chart-card canvas { max-height: 220px; }
-        @media (max-width: 900px) { .stat-container { padding: 18px 6vw; } .stat-grid { flex-direction: column; gap: 18px; } }
-    </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+  background: #f5f7fb;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.stat-container {
+  padding: 30px 50px;        /* padding trái phải nhiều hơn */
+  max-width: 1600px;         /* cho rộng hơn để fit màn hình */
+  margin: auto;
+}
+
+.stat-header {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* responsive tự co dãn */
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.stat-box {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  padding: 25px;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.stat-box:hover {
+  transform: translateY(-5px);
+}
+
+.stat-box .icon {
+  font-size: 28px;
+  margin-bottom: 10px;
+  color: #007bff;
+}
+
+.stat-box .label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+.stat-box .value {
+  font-size: 22px;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.charts-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* ô chart tự co */
+  gap: 25px;
+}
+
+.chart-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  padding: 20px;
+  text-align: center;
+}
+
+.chart-card .chart-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 12px;
+}
+
+.chart-card canvas {
+  max-height: 240px;
+  width: 100%;
+}
+
+.note {
+  text-align: center;
+  color: #888;
+  margin-top: 24px;
+  font-size: 14px;
+}
+
+    </style>
 </head>
 <body>
 <div class="stat-container">
-    <div class="stat-header">Báo cáo thống kê tổng quan</div>
+    <div class="stat-header">📊 Báo cáo thống kê tổng quan</div>
+
     <div class="stat-grid">
         <div class="stat-box">
             <div class="icon"><i class="fa-solid fa-sack-dollar"></i></div>
@@ -54,131 +135,151 @@
             <div class="value"><%= overviewStats != null && overviewStats.get("totalServices") != null ? overviewStats.get("totalServices") : "0" %></div>
         </div>
     </div>
+
     <div class="charts-section">
         <div class="chart-card">
             <div class="chart-title">Doanh thu theo tháng</div>
-            <canvas id="revenueChart" height="60"></canvas>
+            <canvas id="revenueChart"></canvas>
         </div>
         <div class="chart-card">
             <div class="chart-title">Lượt đặt phòng theo tháng</div>
-            <canvas id="bookingChart" height="60"></canvas>
+            <canvas id="bookingChart"></canvas>
         </div>
         <div class="chart-card">
             <div class="chart-title">Tỷ lệ dịch vụ đã bán</div>
-            <canvas id="servicePieChart" height="60"></canvas>
+            <canvas id="servicePieChart"></canvas>
         </div>
     </div>
-    <div style="text-align:center; color:#888; margin-top:24px;">(Dữ liệu thống kê sẽ được cập nhật tự động khi có phát sinh giao dịch)</div>
+
+    <div class="note">(Dữ liệu thống kê sẽ được cập nhật tự động khi có phát sinh giao dịch)</div>
 </div>
+
 <script>
-// Dữ liệu thực từ backend
-const revenueData = {
-    labels: [
-        <% if (monthlyRevenue != null && !monthlyRevenue.isEmpty()) { %>
-            <% for (int i = 0; i < monthlyRevenue.size(); i++) { %>
-                '<%= monthlyRevenue.get(i).get("month") %>'<%= i < monthlyRevenue.size() - 1 ? "," : "" %>
-            <% } %>
-        <% } else { %>
-            'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8'
-        <% } %>
-    ],
-    datasets: [{
-        label: 'Doanh thu (triệu đồng)',
-        data: [
-            <% if (monthlyRevenue != null && !monthlyRevenue.isEmpty()) { %>
-                <% for (int i = 0; i < monthlyRevenue.size(); i++) { %>
-                    <%= ((BigDecimal)monthlyRevenue.get(i).get("revenue")).doubleValue() / 1000000 %><%= i < monthlyRevenue.size() - 1 ? "," : "" %>
-                <% } %>
-            <% } else { %>
-                0, 0, 0, 0, 0, 0, 0, 0
-            <% } %>
-        ],
-        backgroundColor: 'rgba(32,201,151,0.7)',
-        borderColor: '#20c997',
-        borderWidth: 2
-    }]
-};
+  // Doanh thu theo tháng
+  var monthlyRevenue = <%= request.getAttribute("monthlyRevenue") != null ? 
+      new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(monthlyRevenue) : "[]" %>;
+  
+  console.log('DEBUG: Monthly Revenue data: ', monthlyRevenue);
+  
+  var revenueLabels = monthlyRevenue.map(function(item) { return item.month; });
+  var revenueData = monthlyRevenue.map(function(item) { return item.revenue; });
+  
+  var revenueCanvas = document.getElementById('revenueChart');
+  if (revenueCanvas) {
+    var ctx1 = revenueCanvas.getContext('2d');
+    new Chart(ctx1, {
+      type: 'bar',
+      data: { 
+        labels: revenueLabels, 
+        datasets: [{ 
+          label: 'Doanh thu (₫)', 
+          data: revenueData, 
+          backgroundColor: '#007bff',
+          borderColor: '#0056b3',
+          borderWidth: 1
+        }] 
+      },
+      options: { 
+        responsive: true, 
+        plugins: { legend: { display: false } }, 
+        scales: { 
+          y: { 
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return new Intl.NumberFormat('vi-VN').format(value) + '₫';
+              }
+            }
+          } 
+        } 
+      }
+    });
+  }
 
-const bookingData = {
-    labels: [
-        <% if (monthlyBookings != null && !monthlyBookings.isEmpty()) { %>
-            <% for (int i = 0; i < monthlyBookings.size(); i++) { %>
-                '<%= monthlyBookings.get(i).get("month") %>'<%= i < monthlyBookings.size() - 1 ? "," : "" %>
-            <% } %>
-        <% } else { %>
-            'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8'
-        <% } %>
-    ],
-    datasets: [{
-        label: 'Lượt đặt phòng',
-        data: [
-            <% if (monthlyBookings != null && !monthlyBookings.isEmpty()) { %>
-                <% for (int i = 0; i < monthlyBookings.size(); i++) { %>
-                    <%= monthlyBookings.get(i).get("bookings") %><%= i < monthlyBookings.size() - 1 ? "," : "" %>
-                <% } %>
-            <% } else { %>
-                0, 0, 0, 0, 0, 0, 0, 0
-            <% } %>
-        ],
-        fill: false,
-        borderColor: '#667eea',
-        backgroundColor: '#667eea',
-        tension: 0.3
-    }]
-};
+  // Lượt đặt phòng theo tháng
+  var monthlyBookings = <%= request.getAttribute("monthlyBookings") != null ? 
+      new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(monthlyBookings) : "[]" %>;
+  
+  console.log('DEBUG: Monthly Bookings data: ', monthlyBookings);
+  
+  var bookingLabels = monthlyBookings.map(function(item) { return item.month; });
+  var bookingData = monthlyBookings.map(function(item) { return item.bookings; });
+  
+  var bookingCanvas = document.getElementById('bookingChart');
+  if (bookingCanvas) {
+    var ctx2 = bookingCanvas.getContext('2d');
+    new Chart(ctx2, {
+      type: 'line',
+      data: { 
+        labels: bookingLabels, 
+        datasets: [{ 
+          label: 'Lượt đặt', 
+          data: bookingData, 
+          borderColor: '#28a745',
+          backgroundColor: 'rgba(40,167,69,0.1)',
+          fill: true,
+          tension: 0.4
+        }] 
+      },
+      options: { 
+        responsive: true, 
+        plugins: { legend: { display: false } }, 
+        scales: { 
+          y: { 
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          } 
+        } 
+      }
+    });
+  }
 
-const servicePieData = {
-    labels: [
-        <% if (serviceStats != null && !serviceStats.isEmpty()) { %>
-            <% for (int i = 0; i < serviceStats.size(); i++) { %>
-                '<%= serviceStats.get(i).get("name") %>'<%= i < serviceStats.size() - 1 ? "," : "" %>
-            <% } %>
-        <% } else { %>
-            'Chưa có dịch vụ nào'
-        <% } %>
-    ],
-    datasets: [{
-        data: [
-            <% if (serviceStats != null && !serviceStats.isEmpty()) { %>
-                <% for (int i = 0; i < serviceStats.size(); i++) { %>
-                    <%= serviceStats.get(i).get("count") %><%= i < serviceStats.size() - 1 ? "," : "" %>
-                <% } %>
-            <% } else { %>
-                1
-            <% } %>
-        ],
-        backgroundColor: [
-            '#20c997', '#667eea', '#ffb347', '#ff758c', '#a8edea'
-        ],
-        borderWidth: 1
-    }]
-};
-new Chart(document.getElementById('revenueChart'), {
-    type: 'bar',
-    data: revenueData,
-    options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true } }
-    }
-});
-new Chart(document.getElementById('bookingChart'), {
-    type: 'line',
-    data: bookingData,
-    options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true } }
-    }
-});
-new Chart(document.getElementById('servicePieChart'), {
-    type: 'pie',
-    data: servicePieData,
-    options: {
-        responsive: true,
-        plugins: { legend: { position: 'bottom' } }
-    }
-});
+  // Tỷ lệ dịch vụ đã bán (Pie Chart)
+  var serviceStats = <%= request.getAttribute("serviceStats") != null ? 
+      new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(serviceStats) : "[]" %>;
+  
+  console.log('DEBUG: Service Stats data: ', serviceStats);
+  
+  var serviceLabels = serviceStats.map(function(item) { return item.name; });
+  var serviceData = serviceStats.map(function(item) { return item.count; });
+  var serviceColors = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#fd7e14'];
+  
+  // Nếu không có dữ liệu service, hiển thị thông báo
+  if (serviceStats.length === 0) {
+    serviceLabels = ['Chưa có dữ liệu'];
+    serviceData = [1];
+    serviceColors = ['#6c757d'];
+  }
+  
+  var serviceCanvas = document.getElementById('servicePieChart');
+  if (serviceCanvas) {
+    var ctx3 = serviceCanvas.getContext('2d');
+    new Chart(ctx3, {
+      type: 'doughnut',
+      data: { 
+        labels: serviceLabels, 
+        datasets: [{ 
+          data: serviceData, 
+          backgroundColor: serviceColors.slice(0, serviceData.length),
+          borderWidth: 2,
+          borderColor: '#fff'
+        }] 
+      },
+      options: { 
+        responsive: true, 
+        plugins: { 
+          legend: { 
+            display: true,
+            position: 'bottom'
+          } 
+        } 
+      }
+    });
+  } else {
+    console.error('Service chart canvas not found!');
+  }
 </script>
 <%@ include file="../partials/footer.jsp" %>
 </body>

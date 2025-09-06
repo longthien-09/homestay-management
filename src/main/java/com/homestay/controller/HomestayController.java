@@ -28,7 +28,12 @@ public class HomestayController {
     private HomestayService homestayService;
     @Autowired
     private ManagerHomestayDao managerHomestayDao;
-    // Removed unused ServiceService injection
+    @Autowired
+    private com.homestay.service.RoomService roomService;
+    @Autowired
+    private com.homestay.service.ServiceService serviceService;
+    @Autowired
+    private com.homestay.service.HomestayImageService homestayImageService;
 
     @GetMapping("/manager/homestays")
     public String listManagerHomestays(Model model, HttpSession session) {
@@ -54,6 +59,7 @@ public class HomestayController {
     @PostMapping("/manager/homestays/add")
     public String addHomestay(@ModelAttribute Homestay homestay,
                               @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                              @RequestParam(value = "galleryFiles", required = false) MultipartFile[] galleryFiles,
                               HttpSession session, Model model) {
         // Handle image upload if provided
         if (imageFile != null && !imageFile.isEmpty()) {
@@ -78,6 +84,27 @@ public class HomestayController {
             int homestayId = homestayService.createHomestay(homestay);
             if (homestayId > 0) {
                 managerHomestayDao.addManagerHomestay(currentUser.getId(), homestayId);
+                // Lưu gallery nếu có
+                if (galleryFiles != null && galleryFiles.length > 0) {
+                    try {
+                        javax.servlet.ServletContext servletContext = ((org.springframework.web.context.request.ServletRequestAttributes) org.springframework.web.context.request.RequestContextHolder.currentRequestAttributes()).getRequest().getServletContext();
+                        String uploadsDir = "/uploads/homestays/" + homestayId;
+                        String realPath = servletContext.getRealPath(uploadsDir);
+                        if (realPath != null) {
+                            Files.createDirectories(Paths.get(realPath));
+                            int order = 1;
+                            for (MultipartFile f : galleryFiles) {
+                                if (f != null && !f.isEmpty()) {
+                                    String filename = java.util.UUID.randomUUID().toString() + "_" + f.getOriginalFilename();
+                                    Path target = Paths.get(realPath, filename);
+                                    Files.copy(f.getInputStream(), target, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                                    String filePath = (uploadsDir + "/" + filename).replaceFirst("^/", "");
+                                    homestayImageService.addImage(homestayId, filePath, order++);
+                                }
+                            }
+                        }
+                    } catch (IOException ex) { ex.printStackTrace(); }
+                }
                 model.addAttribute("message", "Thêm homestay thành công!");
             } else {
                 model.addAttribute("error", "Không thể thêm homestay!");
@@ -99,7 +126,8 @@ public class HomestayController {
 
     @PostMapping("/manager/homestays/edit")
     public String editHomestay(@ModelAttribute Homestay homestay,
-                               @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
+                               @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                               @RequestParam(value = "galleryFiles", required = false) MultipartFile[] galleryFiles) {
         // Handle optional new image upload
         if (imageFile != null && !imageFile.isEmpty()) {
             try {
@@ -118,16 +146,35 @@ public class HomestayController {
             }
         }
         homestayService.updateHomestay(homestay);
+        // Lưu thêm gallery nếu upload mới
+        if (galleryFiles != null && galleryFiles.length > 0) {
+            try {
+                javax.servlet.ServletContext servletContext = ((org.springframework.web.context.request.ServletRequestAttributes) org.springframework.web.context.request.RequestContextHolder.currentRequestAttributes()).getRequest().getServletContext();
+                String uploadsDir = "/uploads/homestays/" + homestay.getId();
+                String realPath = servletContext.getRealPath(uploadsDir);
+                if (realPath != null) {
+                    Files.createDirectories(Paths.get(realPath));
+                    // sort_order tiếp nối
+                    int order = homestayImageService.getImagesByHomestayId(homestay.getId()).size() + 1;
+                    for (MultipartFile f : galleryFiles) {
+                        if (f != null && !f.isEmpty()) {
+                            String filename = java.util.UUID.randomUUID().toString() + "_" + f.getOriginalFilename();
+                            Path target = Paths.get(realPath, filename);
+                            Files.copy(f.getInputStream(), target, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                            String filePath = (uploadsDir + "/" + filename).replaceFirst("^/", "");
+                            homestayImageService.addImage(homestay.getId(), filePath, order++);
+                        }
+                    }
+                }
+            } catch (IOException ex) { ex.printStackTrace(); }
+        }
         return "redirect:/manager/homestays";
     }
 
     @GetMapping("/manager/homestays/delete/{id}")
     public String deleteHomestay(@PathVariable("id") int id, Model model) {
         boolean success = homestayService.deleteHomestay(id);
-        if (success) {
-            System.out.println("Xóa homestay thành công với id: " + id);
-        } else {
-            System.err.println("Xóa homestay thất bại với id: " + id);
+        if (!success) {
             model.addAttribute("error", "Không thể xóa homestay! Có thể do dữ liệu liên quan hoặc homestay không tồn tại.");
         }
         return "redirect:/manager/homestays";
@@ -140,34 +187,57 @@ public class HomestayController {
                                     @RequestParam(value = "roomType", required = false) String roomType,
                                     @RequestParam(value = "min", required = false) java.math.BigDecimal min,
                                     @RequestParam(value = "max", required = false) java.math.BigDecimal max,
+                                    // Optional new params from home hero search
+                                    @RequestParam(value = "checkin", required = false) String checkin,
+                                    @RequestParam(value = "checkout", required = false) String checkout,
+                                    @RequestParam(value = "guests", required = false) Integer guests,
+                                    @RequestParam(value = "services", required = false) java.util.List<String> services,
                                     @RequestParam(value = "page", defaultValue = "1") int page,
                                     @RequestParam(value = "size", defaultValue = "6") int size) {
-        // Nếu có q/roomType/min/max → dùng search nhanh, bỏ phân trang nhẹ (giới hạn 30)
+        // Nếu có ngày nhận/trả phòng -> ưu tiên tìm homestay còn phòng trống (DB)
+        if (checkin != null && !checkin.trim().isEmpty() && checkout != null && !checkout.trim().isEmpty()) {
+            try {
+                java.time.LocalDate ci = java.time.LocalDate.parse(checkin);
+                java.time.LocalDate co = java.time.LocalDate.parse(checkout);
+                if (!co.isAfter(ci)) {
+                    // Ngày không hợp lệ -> fallback sang search nhanh
+                } else {
+                    java.util.List<Homestay> list = homestayService.searchAvailableHomestays(keyword, roomType, ci, co, min, max);
+                    model.addAttribute("homestays", list);
+                    model.addAttribute("q", keyword);
+                    model.addAttribute("roomType", roomType);
+                    model.addAttribute("min", min);
+                    model.addAttribute("max", max);
+                    model.addAttribute("checkin", checkin);
+                    model.addAttribute("checkout", checkout);
+                    model.addAttribute("guests", guests);
+                    // Giữ lại các dịch vụ đã chọn để re-check checkbox
+                    model.addAttribute("selectedServices", services);
+                    model.addAttribute("totalItems", list != null ? list.size() : 0);
+                    model.addAttribute("totalPages", 1);
+                    model.addAttribute("currentPage", 1);
+                    model.addAttribute("pageSize", list != null ? list.size() : 0);
+                    return "homestay/homestay_public_list";
+                }
+            } catch (Exception ignore) { /* fallback xuống dưới */ }
+        }
+
+        // Nếu có q/roomType/min/max → dùng search nhanh (giới hạn 30)
         if ((keyword != null && !keyword.trim().isEmpty()) ||
             (roomType != null && !roomType.trim().isEmpty()) ||
             min != null || max != null) {
             java.util.List<Homestay> list = homestayService.search(keyword, roomType, min, max);
-            
-            // Lấy services và giá phòng cho mỗi homestay
-            for (Homestay homestay : list) {
-                List<String> services = homestayService.getServiceNamesByHomestayId(homestay.getId());
-                if (!services.isEmpty()) {
-                    String currentDesc = homestay.getDescription() != null ? homestay.getDescription() : "";
-                    homestay.setDescription(currentDesc + " | Dịch vụ: " + String.join(", ", services));
-                }
-                
-                // Lấy thông tin giá phòng
-                java.util.Map<String, Object> priceInfo = homestayService.getRoomPriceInfoByHomestayId(homestay.getId());
-                if (priceInfo.containsKey("minPrice")) {
-                    homestay.setDescription(homestay.getDescription() + " | Giá: " + priceInfo.get("minPrice") + " - " + priceInfo.get("maxPrice"));
-                }
-            }
-            
             model.addAttribute("homestays", list);
             model.addAttribute("q", keyword);
             model.addAttribute("roomType", roomType);
             model.addAttribute("min", min);
             model.addAttribute("max", max);
+            // Echo back optional params (chưa áp dụng lọc nâng cao ở đây)
+            model.addAttribute("checkin", checkin);
+            model.addAttribute("checkout", checkout);
+            model.addAttribute("guests", guests);
+            // Giữ lại các dịch vụ đã chọn để re-check checkbox
+            model.addAttribute("selectedServices", services);
             model.addAttribute("totalItems", list != null ? list.size() : 0);
             model.addAttribute("totalPages", 1);
             model.addAttribute("currentPage", 1);
@@ -189,33 +259,38 @@ public class HomestayController {
             homestays = homestayService.getAllHomestaysWithPagination(page, size);
         }
         
-        // Lấy services và giá phòng cho mỗi homestay
-        for (Homestay homestay : homestays) {
-            List<String> services = homestayService.getServiceNamesByHomestayId(homestay.getId());
-            if (!services.isEmpty()) {
-                String currentDesc = homestay.getDescription() != null ? homestay.getDescription() : "";
-                homestay.setDescription(currentDesc + " | Dịch vụ: " + String.join(", ", services));
-            }
-            
-            // Lấy thông tin giá phòng
-            java.util.Map<String, Object> priceInfo = homestayService.getRoomPriceInfoByHomestayId(homestay.getId());
-            if (priceInfo.containsKey("minPrice")) {
-                homestay.setDescription(homestay.getDescription() + " | Giá: " + priceInfo.get("minPrice") + " - " + priceInfo.get("maxPrice"));
-            }
-        }
-        
         // Tính toán thông tin phân trang
         int totalPages = (int) Math.ceil((double) totalItems / size);
         int startPage = Math.max(1, page - 2);
         int endPage = Math.min(totalPages, page + 2);
         
-        model.addAttribute("homestays", homestays);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("pageSize", size);
-        model.addAttribute("totalItems", totalItems);
-        model.addAttribute("totalPages", totalPages);
+        // Nếu chọn danh sách dịch vụ, áp dụng filter theo dịch vụ trên tập kết quả phân trang cơ bản
+        if (services != null && !services.isEmpty()) {
+            // Để đơn giản, bỏ qua phân trang khi có filter dịch vụ
+            java.util.List<Homestay> filtered = homestayService.filterByServiceNames(services);
+            model.addAttribute("homestays", filtered);
+            model.addAttribute("totalItems", filtered != null ? filtered.size() : 0);
+            model.addAttribute("totalPages", 1);
+            model.addAttribute("currentPage", 1);
+            model.addAttribute("pageSize", filtered != null ? filtered.size() : 0);
+        } else {
+            model.addAttribute("homestays", homestays);
+            model.addAttribute("totalItems", totalItems);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("pageSize", size);
+        }
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
+        // Echo back optional params so UI giữ được giá trị
+        model.addAttribute("q", keyword);
+        model.addAttribute("roomType", roomType);
+        model.addAttribute("min", min);
+        model.addAttribute("max", max);
+        model.addAttribute("checkin", checkin);
+        model.addAttribute("checkout", checkout);
+        model.addAttribute("guests", guests);
+        model.addAttribute("selectedServices", services);
         
         return "homestay/homestay_public_list";
     }
@@ -225,6 +300,27 @@ public class HomestayController {
         Homestay homestay = homestayService.getHomestayById(id);
         if (homestay != null) {
             model.addAttribute("homestay", homestay);
+            
+            // Lấy thông tin phòng
+            List<com.homestay.model.Room> rooms = roomService.getRoomsByHomestayId(id);
+            model.addAttribute("rooms", rooms);
+            
+            // Lấy dịch vụ của homestay
+            List<com.homestay.model.Service> services = serviceService.getServicesByHomestayId(id);
+            model.addAttribute("services", services);
+            
+            // Lấy danh sách ảnh (đường dẫn file) từ DB
+            java.util.List<com.homestay.model.HomestayImage> images = homestayImageService.getImagesByHomestayId(id);
+            model.addAttribute("images", images);
+            
+            // Tính giá từ thấp nhất
+            java.math.BigDecimal minPrice = rooms.stream()
+                .map(com.homestay.model.Room::getPrice)
+                .filter(price -> price != null)
+                .min(java.math.BigDecimal::compareTo)
+                .orElse(java.math.BigDecimal.ZERO);
+            model.addAttribute("minPrice", minPrice);
+            
             return "homestay/homestay_detail";
         } else {
             return "redirect:/homestay-management/homestays";

@@ -30,8 +30,19 @@ public class BookingService {
 
     public boolean approve(int bookingId) { return bookingDao.updateStatus(bookingId, "CONFIRMED"); }
     public boolean reject(int bookingId) { return bookingDao.updateStatus(bookingId, "CANCELLED"); }
+    public boolean updateStatus(int bookingId, String status) { return bookingDao.updateStatus(bookingId, status); }
+    
+    public boolean updateBookingDates(int bookingId, java.time.LocalDate checkIn, java.time.LocalDate checkOut) {
+        return bookingDao.updateBookingDates(bookingId, checkIn, checkOut);
+    }
+    
+    public boolean updateBookingDatesAndRecalculate(int bookingId, java.time.LocalDate checkIn, java.time.LocalDate checkOut) {
+        return bookingDao.updateBookingDatesAndRecalculate(bookingId, checkIn, checkOut);
+    }
 
     public List<Booking> userHistory(int userId) { return bookingDao.findByUser(userId); }
+    
+    public List<Map<String,Object>> userDetailedHistory(int userId) { return bookingDao.findDetailedByUser(userId); }
 
     public List<Map<String,Object>> adminList(Integer homestayId, String status) { return bookingDao.adminList(homestayId, status); }
 

@@ -57,20 +57,20 @@ public class HomestayService {
     public java.util.List<Homestay> search(String keyword, String roomType, java.math.BigDecimal minPrice, java.math.BigDecimal maxPrice) {
         return homestayDao.search(keyword, roomType, minPrice, maxPrice);
     }
-    
-    public Homestay getHomestayWithServices(int id) {
-        return homestayDao.getHomestayWithServices(id);
+
+    public java.util.List<Homestay> searchAvailableHomestays(String keyword,
+                                                             String roomType,
+                                                             java.time.LocalDate checkIn,
+                                                             java.time.LocalDate checkOut,
+                                                             java.math.BigDecimal minPrice,
+                                                             java.math.BigDecimal maxPrice) {
+        java.sql.Date ci = checkIn != null ? java.sql.Date.valueOf(checkIn) : null;
+        java.sql.Date co = checkOut != null ? java.sql.Date.valueOf(checkOut) : null;
+        if (ci == null || co == null) return java.util.Collections.emptyList();
+        return homestayDao.searchAvailableHomestays(keyword, roomType, ci, co, minPrice, maxPrice);
     }
-    
-    public List<String> getServiceNamesByHomestayId(int homestayId) {
-        return homestayDao.getServiceNamesByHomestayId(homestayId);
-    }
-    
-    public java.math.BigDecimal getMinRoomPriceByHomestayId(int homestayId) {
-        return homestayDao.getMinRoomPriceByHomestayId(homestayId);
-    }
-    
-    public java.util.Map<String, Object> getRoomPriceInfoByHomestayId(int homestayId) {
-        return homestayDao.getRoomPriceInfoByHomestayId(homestayId);
+
+    public java.util.List<Homestay> filterByServiceNames(java.util.List<String> serviceNames) {
+        return homestayDao.filterByServiceNames(serviceNames);
     }
 }

@@ -81,6 +81,24 @@ public class StatisticsDao {
         return BigDecimal.ZERO;
     }
     
+    public BigDecimal getTotalRevenueByHomestayId(int homestayId) {
+        String sql = "SELECT COALESCE(SUM(p.amount), 0) as total_revenue " +
+                "FROM payments p " +
+                "INNER JOIN bookings b ON p.booking_id = b.id " +
+                "INNER JOIN rooms r ON b.room_id = r.id " +
+                "WHERE r.homestay_id = ? AND p.status = 'PAID'";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, homestayId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getBigDecimal("total_revenue");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return BigDecimal.ZERO;
+    }
+    
     public Integer getTotalBookings(int managerId) {
         List<Integer> ids = getConfiguredHomestayIdList();
         String sql;

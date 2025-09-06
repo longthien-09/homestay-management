@@ -13,7 +13,14 @@ public class PaymentDao {
 
     public List<Map<String,Object>> findByUser(int userId) {
         List<Map<String,Object>> list = new ArrayList<>();
-        String sql = "SELECT p.*, b.user_id FROM payments p JOIN bookings b ON p.booking_id=b.id WHERE b.user_id=? ORDER BY p.payment_date DESC";
+        String sql = "SELECT p.*, b.user_id, r.room_number, h.name as homestay_name, " +
+                    "DATE_FORMAT(p.payment_date, '%d/%m/%Y') as payment_date_formatted, " +
+                    "DATE_FORMAT(p.payment_date, '%H:%i') as payment_time " +
+                    "FROM payments p " +
+                    "JOIN bookings b ON p.booking_id=b.id " +
+                    "JOIN rooms r ON b.room_id=r.id " +
+                    "JOIN homestays h ON r.homestay_id=h.id " +
+                    "WHERE b.user_id=? AND p.status IN ('PAID', 'PENDING') ORDER BY p.payment_date DESC";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
@@ -28,14 +35,15 @@ public class PaymentDao {
         List<Map<String,Object>> list = new ArrayList<>();
         if (homestayIds == null || homestayIds.isEmpty()) return list;
         String inClause = String.join(",", Collections.nCopies(homestayIds.size(), "?"));
-        String sql = "SELECT p.*, b.user_id, u.full_name AS user_name, u.username, r.homestay_id, h.name AS homestay_name, r.room_number " +
+        String sql = "SELECT p.*, b.user_id, r.homestay_id, r.room_number, h.name as homestay_name, u.full_name as user_name, " +
+                    "DATE_FORMAT(p.payment_date, '%d/%m/%Y') as payment_date_formatted, " +
+                    "DATE_FORMAT(p.payment_date, '%H:%i') as payment_time " +
                     "FROM payments p " +
                     "JOIN bookings b ON p.booking_id=b.id " +
-                    "JOIN users u ON b.user_id=u.id " +
                     "JOIN rooms r ON b.room_id=r.id " +
                     "JOIN homestays h ON r.homestay_id=h.id " +
-                    "WHERE r.homestay_id IN ("+inClause+") " +
-                    "ORDER BY p.payment_date DESC";
+                    "JOIN users u ON b.user_id=u.id " +
+                    "WHERE r.homestay_id IN ("+inClause+") AND p.status IN ('PAID', 'PENDING') ORDER BY p.payment_date DESC";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             for (int i=0;i<homestayIds.size();i++) ps.setInt(i+1, homestayIds.get(i));
